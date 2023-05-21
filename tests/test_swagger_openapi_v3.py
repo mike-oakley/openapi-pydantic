@@ -2,7 +2,7 @@ from typing import Dict, Optional
 
 from pydantic import Field
 
-from openapi_pydantic import OpenAPI, Operation, PathItem
+from openapi_pydantic.v3.v3_0_3 import OpenAPI, Operation, PathItem
 
 
 def test_swagger_openapi_v3() -> None:
