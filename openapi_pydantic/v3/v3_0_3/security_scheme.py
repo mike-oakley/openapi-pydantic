@@ -1,6 +1,6 @@
-from typing import Optional, Union
+from typing import Optional
 
-from pydantic import AnyUrl, BaseModel, Extra, Field
+from pydantic import BaseModel, Extra, Field
 
 from .oauth_flows import OAuthFlows
 
@@ -63,7 +63,7 @@ class SecurityScheme(BaseModel):
     flow types supported.
     """
 
-    openIdConnectUrl: Optional[Union[AnyUrl, str]] = None
+    openIdConnectUrl: Optional[str] = None
     """
     **REQUIRED** for `openIdConnect`. OpenId Connect URL to discover OAuth2 
     configuration values. This MUST be in the form of a URL.

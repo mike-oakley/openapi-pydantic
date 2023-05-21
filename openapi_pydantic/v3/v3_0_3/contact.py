@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import AnyUrl, BaseModel, Extra
+from pydantic import BaseModel, Extra
 
 
 class Contact(BaseModel):
@@ -13,7 +13,7 @@ class Contact(BaseModel):
     The identifying name of the contact person/organization.
     """
 
-    url: Optional[AnyUrl] = None
+    url: Optional[str] = None
     """
     The URL pointing to the contact information.
     MUST be in the format of a URL.

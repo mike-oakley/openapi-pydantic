@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import AnyUrl, BaseModel, Extra
+from pydantic import BaseModel, Extra
 
 
 class License(BaseModel):
@@ -13,7 +13,7 @@ class License(BaseModel):
     **REQUIRED**. The license name used for the API.
     """
 
-    url: Optional[AnyUrl] = None
+    url: Optional[str] = None
     """
     A URL to the license used for the API.
     MUST be in the format of a URL.
