@@ -1,7 +1,7 @@
 name: Publish
 
 on:
-  push:
+  workflow_dispatch:
     branches:
       - main
   release:
@@ -33,7 +33,7 @@ jobs:
           path: dist
   test-release:
     name: Publish release to Test PyPI
-    if: github.event_name != 'release'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: build
     environment:
