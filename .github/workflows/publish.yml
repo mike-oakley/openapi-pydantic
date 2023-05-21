@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - release-test
   release:
     types:
       - published
@@ -34,6 +33,7 @@ jobs:
           path: dist
   test-release:
     name: Publish release to Test PyPI
+    if: github.event_name != 'release'
     runs-on: ubuntu-latest
     needs: build
     environment:
