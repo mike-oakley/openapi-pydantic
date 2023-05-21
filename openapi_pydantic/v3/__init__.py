@@ -3,6 +3,7 @@ from .v3_1_0 import XML as XML
 from .v3_1_0 import Callback as Callback
 from .v3_1_0 import Components as Components
 from .v3_1_0 import Contact as Contact
+from .v3_1_0 import DataType as DataType
 from .v3_1_0 import Discriminator as Discriminator
 from .v3_1_0 import Encoding as Encoding
 from .v3_1_0 import Example as Example
