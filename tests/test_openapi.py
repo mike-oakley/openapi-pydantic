@@ -27,11 +27,50 @@ def test_parse_with_callback(version: str) -> None:
     }
 
     if version == "3.0.3":
-        module = v3_0_3
+        assert v3_0_3.OpenAPI.parse_obj(data) == v3_0_3.OpenAPI(
+            info=v3_0_3.Info(title="API with Callback", version=""),
+            paths={
+                "/create": v3_0_3.PathItem(
+                    post=v3_0_3.Operation(
+                        responses={"200": v3_0_3.Response(description="Success")},
+                        callbacks={
+                            "event": {
+                                "callback": v3_0_3.PathItem(
+                                    post=v3_0_3.Operation(
+                                        responses={
+                                            "200": v3_0_3.Response(
+                                                description="Success"
+                                            )
+                                        }
+                                    )
+                                )
+                            }
+                        },
+                    )
+                )
+            },
+        )
     else:
-        module = v3_1_0
-
-    open_api = module.OpenAPI.parse_obj(data)
-    create_endpoint = open_api.paths["/create"]
-    assert "200" in create_endpoint.post.responses
-    assert "200" in create_endpoint.post.callbacks["event"]["callback"].post.responses
+        assert v3_1_0.OpenAPI.parse_obj(data) == v3_1_0.OpenAPI(
+            info=v3_1_0.Info(title="API with Callback", version=""),
+            paths={
+                "/create": v3_1_0.PathItem(
+                    post=v3_1_0.Operation(
+                        responses={"200": v3_1_0.Response(description="Success")},
+                        callbacks={
+                            "event": {
+                                "callback": v3_1_0.PathItem(
+                                    post=v3_1_0.Operation(
+                                        responses={
+                                            "200": v3_1_0.Response(
+                                                description="Success"
+                                            )
+                                        }
+                                    )
+                                )
+                            }
+                        },
+                    )
+                )
+            },
+        )
