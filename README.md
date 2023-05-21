@@ -74,9 +74,20 @@ Pydantic is a great tool, allow you to use object / dict / mixed data for for in
 The following examples give the same OpenAPI result as above:
 
 ```python
-from openapi_pydantic import OpenAPI, PathItem, Response
+from openapi_pydantic import parse_obj, OpenAPI, PathItem, Response
 
-# Construct OpenAPI from dict
+# Construct OpenAPI from dict, inferring the correct schema version
+open_api = parse_obj({
+    "info": {"title": "My own API", "version": "v0.0.1"},
+    "paths": {
+        "/ping": {
+            "get": {"responses": {"200": {"description": "pong"}}}
+        }
+    },
+})
+
+
+# Construct OpenAPI v3.1.0 schema from dict
 open_api = OpenAPI.parse_obj({
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {

@@ -1,3 +1,4 @@
+from .parser import parse_obj as parse_obj
 from .v3_1_0 import XML as XML
 from .v3_1_0 import Callback as Callback
 from .v3_1_0 import Components as Components
