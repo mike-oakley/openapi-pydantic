@@ -4,6 +4,7 @@ from .v3 import XML as XML
 from .v3 import Callback as Callback
 from .v3 import Components as Components
 from .v3 import Contact as Contact
+from .v3 import DataType as DataType
 from .v3 import Discriminator as Discriminator
 from .v3 import Encoding as Encoding
 from .v3 import Example as Example

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openapi-pydantic"
-version = "0.2.1"
+version = "0.2.2"
 description = "Pydantic OpenAPI schema implementation"
 authors = ["Mike Oakley <mike-oakley@users.noreply.github.com>"]
 readme = "README.md"
