@@ -9,6 +9,7 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md#table
 from .callback import Callback as Callback
 from .components import Components as Components
 from .contact import Contact as Contact
+from .datatype import DataType as DataType
 from .discriminator import Discriminator as Discriminator
 from .encoding import Encoding as Encoding
 from .example import Example as Example
