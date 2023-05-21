@@ -1,6 +1,6 @@
 from typing import Dict, Optional, Union
 
-from pydantic import AnyUrl, BaseModel, Extra
+from pydantic import BaseModel, Extra
 
 
 class OAuthFlow(BaseModel):
@@ -8,21 +8,21 @@ class OAuthFlow(BaseModel):
     Configuration details for a supported OAuth Flow
     """
 
-    authorizationUrl: Optional[Union[AnyUrl, str]] = None
+    authorizationUrl: Optional[str] = None
     """
     **REQUIRED** for `oauth2 ("implicit", "authorizationCode")`.
     The authorization URL to be used for this flow.
     This MUST be in the form of a URL.
     """
 
-    tokenUrl: Optional[Union[AnyUrl, str]] = None
+    tokenUrl: Optional[str] = None
     """
     **REQUIRED** for `oauth2 ("password", "clientCredentials", "authorizationCode")`.
     The token URL to be used for this flow.
     This MUST be in the form of a URL.
     """
 
-    refreshUrl: Optional[Union[AnyUrl, str]] = None
+    refreshUrl: Optional[str] = None
     """
     The URL to be used for obtaining refresh tokens. This MUST be in the form of a URL.
     """

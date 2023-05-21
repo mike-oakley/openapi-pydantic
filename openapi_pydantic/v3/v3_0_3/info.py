@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import AnyUrl, BaseModel, Extra
+from pydantic import BaseModel, Extra
 
 from .contact import Contact
 from .license import License
@@ -25,7 +25,7 @@ class Info(BaseModel):
     representation.
     """
 
-    termsOfService: Optional[AnyUrl] = None
+    termsOfService: Optional[str] = None
     """
     A URL to the Terms of Service for the API.
     MUST be in the format of a URL.

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import AnyUrl, BaseModel, Extra
+from pydantic import BaseModel, Extra
 
 
 class ExternalDocumentation(BaseModel):
@@ -13,7 +13,7 @@ class ExternalDocumentation(BaseModel):
     representation.
     """
 
-    url: AnyUrl
+    url: str
     """
     **REQUIRED**. The URL for the target documentation.
     Value MUST be in the format of a URL.
