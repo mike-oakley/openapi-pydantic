@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Extra
 
@@ -14,7 +14,7 @@ from .tag import Tag
 class OpenAPI(BaseModel):
     """This is the root document object of the OpenAPI document."""
 
-    openapi: str = "3.0.3"
+    openapi: Literal["3.0.3", "3.0.2", "3.0.1", "3.0.0"] = "3.0.3"
     """
     **REQUIRED**. This string MUST be the [semantic version number](https://semver.org/spec/v2.0.0.html)
     of the [OpenAPI Specification version](#versions) that the OpenAPI document uses. 

@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Extra
 
@@ -16,7 +16,7 @@ from .tag import Tag
 class OpenAPI(BaseModel):
     """This is the root document object of the OpenAPI document."""
 
-    openapi: str = "3.1.0"
+    openapi: Literal["3.1.0"] = "3.1.0"
     """
     **REQUIRED**. This string MUST be the [version number](#versions)
     of the OpenAPI Specification that the OpenAPI document uses.
