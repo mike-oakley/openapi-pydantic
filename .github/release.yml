@@ -19,3 +19,6 @@ changelog:
     - title: Dependencies 📦
       labels:
         - dependencies
+    - title: Docs 📝
+      labels:
+        - documentation
