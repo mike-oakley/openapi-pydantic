@@ -8,6 +8,8 @@ OpenAPI schema implemented in [Pydantic](https://github.com/samuelcolvin/pydanti
 The naming of the classes follows the schema in 
 [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md#schema).
 
+> This library is forked from [OpenAPI Schema Pydantic](https://github.com/kuimono/openapi-schema-pydantic)  (at version [1.2.4](https://github.com/kuimono/openapi-schema-pydantic/releases/tag/v1.2.4)) which is no longer actively maintained.
+
 ## Installation
 
 `pip install openapi-pydantic`
