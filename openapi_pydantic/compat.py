@@ -5,11 +5,7 @@ from typing import TYPE_CHECKING
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
 PYDANTIC_MAJOR_VERSION = int(PYDANTIC_VERSION.split(".", 1)[0])
-
-if int(PYDANTIC_MAJOR_VERSION) >= 2:
-    PYDANTIC_V2 = True
-else:
-    PYDANTIC_V2 = False
+PYDANTIC_V2 = int(PYDANTIC_MAJOR_VERSION) >= 2
 
 if TYPE_CHECKING:
     # Provide stubs for either version of Pydantic
