@@ -1,6 +1,35 @@
 from typing import Dict, Optional
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
+
+_examples = [
+    {
+        "authorizationUrl": "https://example.com/api/oauth/dialog",
+        "scopes": {
+            "write:pets": "modify pets in your account",
+            "read:pets": "read your pets",
+        },
+    },
+    {
+        "authorizationUrl": "https://example.com/api/oauth/dialog",
+        "tokenUrl": "https://example.com/api/oauth/token",
+        "scopes": {
+            "write:pets": "modify pets in your account",
+            "read:pets": "read your pets",
+        },
+    },
+    {
+        "authorizationUrl": "/api/oauth/dialog",
+        "tokenUrl": "/api/oauth/token",
+        "refreshUrl": "/api/oauth/token",
+        "scopes": {
+            "write:pets": "modify pets in your account",
+            "read:pets": "read your pets",
+        },
+    },
+]
 
 
 class OAuthFlow(BaseModel):
@@ -38,33 +67,14 @@ class OAuthFlow(BaseModel):
     The map MAY be empty.
     """
 
-    class Config:
-        extra = Extra.allow
-        schema_extra = {
-            "examples": [
-                {
-                    "authorizationUrl": "https://example.com/api/oauth/dialog",
-                    "scopes": {
-                        "write:pets": "modify pets in your account",
-                        "read:pets": "read your pets",
-                    },
-                },
-                {
-                    "authorizationUrl": "https://example.com/api/oauth/dialog",
-                    "tokenUrl": "https://example.com/api/oauth/token",
-                    "scopes": {
-                        "write:pets": "modify pets in your account",
-                        "read:pets": "read your pets",
-                    },
-                },
-                {
-                    "authorizationUrl": "/api/oauth/dialog",
-                    "tokenUrl": "/api/oauth/token",
-                    "refreshUrl": "/api/oauth/token",
-                    "scopes": {
-                        "write:pets": "modify pets in your account",
-                        "read:pets": "read your pets",
-                    },
-                },
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            schema_extra = {"examples": _examples}

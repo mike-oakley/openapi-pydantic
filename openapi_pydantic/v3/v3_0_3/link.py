@@ -1,8 +1,21 @@
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .server import Server
+
+_examples = [
+    {
+        "operationId": "getUserAddressByUUID",
+        "parameters": {"userUuid": "$response.body#/uuid"},
+    },
+    {
+        "operationRef": "#/paths/~12.0~1repositories~1{username}/get",
+        "parameters": {"username": "$response.body#/username"},
+    },
+]
 
 
 class Link(BaseModel):
@@ -68,17 +81,14 @@ class Link(BaseModel):
     A server object to be used by the target operation.
     """
 
-    class Config:
-        extra = Extra.allow
-        schema_extra = {
-            "examples": [
-                {
-                    "operationId": "getUserAddressByUUID",
-                    "parameters": {"userUuid": "$response.body#/uuid"},
-                },
-                {
-                    "operationRef": "#/paths/~12.0~1repositories~1{username}/get",
-                    "parameters": {"username": "$response.body#/username"},
-                },
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            schema_extra = {"examples": _examples}

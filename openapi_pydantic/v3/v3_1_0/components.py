@@ -1,6 +1,8 @@
 from typing import Dict, Optional, Union
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .callback import Callback
 from .example import Example
@@ -13,6 +15,81 @@ from .request_body import RequestBody
 from .response import Response
 from .schema import Schema
 from .security_scheme import SecurityScheme
+
+_examples = [
+    {
+        "schemas": {
+            "GeneralError": {
+                "type": "object",
+                "properties": {
+                    "code": {"type": "integer", "format": "int32"},
+                    "message": {"type": "string"},
+                },
+            },
+            "Category": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer", "format": "int64"},
+                    "name": {"type": "string"},
+                },
+            },
+            "Tag": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer", "format": "int64"},
+                    "name": {"type": "string"},
+                },
+            },
+        },
+        "parameters": {
+            "skipParam": {
+                "name": "skip",
+                "in": "query",
+                "description": "number of items to skip",
+                "required": True,
+                "schema": {"type": "integer", "format": "int32"},
+            },
+            "limitParam": {
+                "name": "limit",
+                "in": "query",
+                "description": "max records to return",
+                "required": True,
+                "schema": {"type": "integer", "format": "int32"},
+            },
+        },
+        "responses": {
+            "NotFound": {"description": "Entity not found."},
+            "IllegalInput": {"description": "Illegal input for operation."},
+            "GeneralError": {
+                "description": "General Error",
+                "content": {
+                    "application/json": {
+                        "schema": {"$ref": "#/components/schemas/GeneralError"}
+                    }
+                },
+            },
+        },
+        "securitySchemes": {
+            "api_key": {
+                "type": "apiKey",
+                "name": "api_key",
+                "in": "header",
+            },
+            "petstore_auth": {
+                "type": "oauth2",
+                "flows": {
+                    "implicit": {
+                        "authorizationUrl": "http://example.org/api/oauth/dialog",
+                        "scopes": {
+                            "write:pets": "modify pets in your account",
+                            "read:pets": "read your pets",
+                        },
+                    }
+                },
+            },
+        },
+    }
+]
 
 
 class Components(BaseModel):
@@ -52,83 +129,14 @@ class Components(BaseModel):
     pathItems: Optional[Dict[str, Union[PathItem, Reference]]] = None
     """An object to hold reusable [Path Item Object](#pathItemObject)."""
 
-    class Config:
-        extra = Extra.allow
-        schema_extra = {
-            "examples": [
-                {
-                    "schemas": {
-                        "GeneralError": {
-                            "type": "object",
-                            "properties": {
-                                "code": {"type": "integer", "format": "int32"},
-                                "message": {"type": "string"},
-                            },
-                        },
-                        "Category": {
-                            "type": "object",
-                            "properties": {
-                                "id": {"type": "integer", "format": "int64"},
-                                "name": {"type": "string"},
-                            },
-                        },
-                        "Tag": {
-                            "type": "object",
-                            "properties": {
-                                "id": {"type": "integer", "format": "int64"},
-                                "name": {"type": "string"},
-                            },
-                        },
-                    },
-                    "parameters": {
-                        "skipParam": {
-                            "name": "skip",
-                            "in": "query",
-                            "description": "number of items to skip",
-                            "required": True,
-                            "schema": {"type": "integer", "format": "int32"},
-                        },
-                        "limitParam": {
-                            "name": "limit",
-                            "in": "query",
-                            "description": "max records to return",
-                            "required": True,
-                            "schema": {"type": "integer", "format": "int32"},
-                        },
-                    },
-                    "responses": {
-                        "NotFound": {"description": "Entity not found."},
-                        "IllegalInput": {"description": "Illegal input for operation."},
-                        "GeneralError": {
-                            "description": "General Error",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "$ref": "#/components/schemas/GeneralError"
-                                    }
-                                }
-                            },
-                        },
-                    },
-                    "securitySchemes": {
-                        "api_key": {
-                            "type": "apiKey",
-                            "name": "api_key",
-                            "in": "header",
-                        },
-                        "petstore_auth": {
-                            "type": "oauth2",
-                            "flows": {
-                                "implicit": {
-                                    "authorizationUrl": "http://example.org/api/oauth/dialog",
-                                    "scopes": {
-                                        "write:pets": "modify pets in your account",
-                                        "read:pets": "read your pets",
-                                    },
-                                }
-                            },
-                        },
-                    },
-                }
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            schema_extra = {"examples": _examples}

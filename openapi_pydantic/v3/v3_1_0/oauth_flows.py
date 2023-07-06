@@ -1,6 +1,8 @@
 from typing import Optional
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .oauth_flow import OAuthFlow
 
@@ -34,5 +36,12 @@ class OAuthFlows(BaseModel):
     Previously called `accessCode` in OpenAPI 2.0.
     """
 
-    class Config:
-        extra = Extra.allow
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow

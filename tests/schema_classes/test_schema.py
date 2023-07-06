@@ -1,13 +1,21 @@
 import logging
 
-from pydantic import BaseModel, Extra
-from pydantic.schema import schema
+from pydantic import BaseModel
 
 from openapi_pydantic import Reference, Schema
+from openapi_pydantic.compat import (
+    DEFS_KEY,
+    PYDANTIC_V2,
+    ConfigDict,
+    Extra,
+    models_json_schema,
+    v1_schema,
+)
 
 
 def test_schema() -> None:
-    schema = Schema.parse_obj(
+    schema_validate = Schema.model_validate if PYDANTIC_V2 else Schema.parse_obj
+    schema = schema_validate(
         {
             "title": "reference list",
             "description": "schema for list of reference type",
@@ -25,12 +33,23 @@ def test_additional_properties_is_bool() -> None:
     class TestModel(BaseModel):
         test_field: str
 
-        class Config:
-            extra = Extra.forbid
+        if PYDANTIC_V2:
+            model_config = ConfigDict(
+                extra="forbid",
+            )
 
-    schema_definition = schema([TestModel])
+        else:
+
+            class Config:
+                extra = Extra.forbid
+
+    if PYDANTIC_V2:
+        _key_map, schema_definition = models_json_schema([(TestModel, "validation")])
+    else:
+        schema_definition = v1_schema([TestModel])
+
     assert schema_definition == {
-        "definitions": {
+        DEFS_KEY: {
             "TestModel": {
                 "title": "TestModel",
                 "type": "object",
@@ -42,5 +61,6 @@ def test_additional_properties_is_bool() -> None:
     }
 
     # allow "additionalProperties" to have boolean value
-    result = Schema.parse_obj(schema_definition["definitions"]["TestModel"])
+    schema_validate = Schema.model_validate if PYDANTIC_V2 else Schema.parse_obj
+    result = schema_validate(schema_definition[DEFS_KEY]["TestModel"])
     assert result.additionalProperties is False

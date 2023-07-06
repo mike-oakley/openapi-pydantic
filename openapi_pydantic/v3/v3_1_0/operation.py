@@ -1,6 +1,8 @@
 from typing import Dict, List, Optional, Union
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .callback import Callback
 from .external_documentation import ExternalDocumentation
@@ -10,6 +12,54 @@ from .request_body import RequestBody
 from .responses import Responses
 from .security_requirement import SecurityRequirement
 from .server import Server
+
+_examples = [
+    {
+        "tags": ["pet"],
+        "summary": "Updates a pet in the store with form data",
+        "operationId": "updatePetWithForm",
+        "parameters": [
+            {
+                "name": "petId",
+                "in": "path",
+                "description": "ID of pet that needs to be updated",
+                "required": True,
+                "schema": {"type": "string"},
+            }
+        ],
+        "requestBody": {
+            "content": {
+                "application/x-www-form-urlencoded": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "description": "Updated name of the pet",
+                                "type": "string",
+                            },
+                            "status": {
+                                "description": "Updated status of the pet",
+                                "type": "string",
+                            },
+                        },
+                        "required": ["status"],
+                    }
+                }
+            }
+        },
+        "responses": {
+            "200": {
+                "description": "Pet updated.",
+                "content": {"application/json": {}, "application/xml": {}},
+            },
+            "405": {
+                "description": "Method Not Allowed",
+                "content": {"application/json": {}, "application/xml": {}},
+            },
+        },
+        "security": [{"petstore_auth": ["write:pets", "read:pets"]}],
+    }
+]
 
 
 class Operation(BaseModel):
@@ -113,54 +163,14 @@ class Operation(BaseModel):
     level, it will be overridden by this value.
     """
 
-    class Config:
-        extra = Extra.allow
-        schema_extra = {
-            "examples": [
-                {
-                    "tags": ["pet"],
-                    "summary": "Updates a pet in the store with form data",
-                    "operationId": "updatePetWithForm",
-                    "parameters": [
-                        {
-                            "name": "petId",
-                            "in": "path",
-                            "description": "ID of pet that needs to be updated",
-                            "required": True,
-                            "schema": {"type": "string"},
-                        }
-                    ],
-                    "requestBody": {
-                        "content": {
-                            "application/x-www-form-urlencoded": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "name": {
-                                            "description": "Updated name of the pet",
-                                            "type": "string",
-                                        },
-                                        "status": {
-                                            "description": "Updated status of the pet",
-                                            "type": "string",
-                                        },
-                                    },
-                                    "required": ["status"],
-                                }
-                            }
-                        }
-                    },
-                    "responses": {
-                        "200": {
-                            "description": "Pet updated.",
-                            "content": {"application/json": {}, "application/xml": {}},
-                        },
-                        "405": {
-                            "description": "Method Not Allowed",
-                            "content": {"application/json": {}, "application/xml": {}},
-                        },
-                    },
-                    "security": [{"petstore_auth": ["write:pets", "read:pets"]}],
-                }
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            schema_extra = {"examples": _examples}

@@ -1,11 +1,26 @@
 from typing import TYPE_CHECKING, Dict, Optional, Union
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .reference import Reference
 
 if TYPE_CHECKING:
     from .header import Header
+
+_examples = [
+    {
+        "contentType": "image/png, image/jpeg",
+        "headers": {
+            "X-Rate-Limit-Limit": {
+                "description": "The number of allowed requests in the "
+                "current period",
+                "schema": {"type": "integer"},
+            }
+        },
+    }
+]
 
 
 class Encoding(BaseModel):
@@ -66,19 +81,14 @@ class Encoding(BaseModel):
     `application/x-www-form-urlencoded`.
     """
 
-    class Config:
-        extra = Extra.allow
-        schema_extra = {
-            "examples": [
-                {
-                    "contentType": "image/png, image/jpeg",
-                    "headers": {
-                        "X-Rate-Limit-Limit": {
-                            "description": "The number of allowed requests in the "
-                            "current period",
-                            "schema": {"type": "integer"},
-                        }
-                    },
-                }
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            schema_extra = {"examples": _examples}

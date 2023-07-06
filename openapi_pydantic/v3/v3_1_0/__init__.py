@@ -6,6 +6,8 @@ The type orders are according to the contents of the specification:
 https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md#table-of-contents
 """
 
+from openapi_pydantic.compat import PYDANTIC_V2
+
 from .callback import Callback as Callback
 from .components import Components as Components
 from .contact import Contact as Contact
@@ -40,6 +42,12 @@ from .tag import Tag as Tag
 from .xml import XML as XML
 
 # resolve forward references
-Encoding.update_forward_refs(Header=Header)
-Schema.update_forward_refs()
-Operation.update_forward_refs(PathItem=PathItem)
+if PYDANTIC_V2:
+    Encoding.model_rebuild()
+    OpenAPI.model_rebuild()
+    Components.model_rebuild()
+    Operation.model_rebuild()
+else:
+    Encoding.update_forward_refs(Header=Header)
+    Schema.update_forward_refs()
+    Operation.update_forward_refs(PathItem=PathItem)

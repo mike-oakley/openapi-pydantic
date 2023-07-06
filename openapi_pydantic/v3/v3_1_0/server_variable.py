@@ -1,6 +1,8 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 
 class ServerVariable(BaseModel):
@@ -29,5 +31,12 @@ class ServerVariable(BaseModel):
     representation.
     """
 
-    class Config:
-        extra = Extra.allow
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow

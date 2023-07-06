@@ -1,11 +1,42 @@
 from typing import Any, Dict, Optional, Union
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .encoding import Encoding
 from .example import Example
 from .reference import Reference
 from .schema import Schema
+
+_examples = [
+    {
+        "schema": {"$ref": "#/components/schemas/Pet"},
+        "examples": {
+            "cat": {
+                "summary": "An example of a cat",
+                "value": {
+                    "name": "Fluffy",
+                    "petType": "Cat",
+                    "color": "White",
+                    "gender": "male",
+                    "breed": "Persian",
+                },
+            },
+            "dog": {
+                "summary": "An example of a dog with a cat's name",
+                "value": {
+                    "name": "Puma",
+                    "petType": "Dog",
+                    "color": "Black",
+                    "gender": "Female",
+                    "breed": "Mixed",
+                },
+            },
+            "frog": {"$ref": "#/components/examples/frog-example"},
+        },
+    }
+]
 
 
 class MediaType(BaseModel):
@@ -51,36 +82,16 @@ class MediaType(BaseModel):
     when the media type is `multipart` or `application/x-www-form-urlencoded`.
     """
 
-    class Config:
-        extra = Extra.allow
-        allow_population_by_field_name = True
-        schema_extra = {
-            "examples": [
-                {
-                    "schema": {"$ref": "#/components/schemas/Pet"},
-                    "examples": {
-                        "cat": {
-                            "summary": "An example of a cat",
-                            "value": {
-                                "name": "Fluffy",
-                                "petType": "Cat",
-                                "color": "White",
-                                "gender": "male",
-                                "breed": "Persian",
-                            },
-                        },
-                        "dog": {
-                            "summary": "An example of a dog with a cat's name",
-                            "value": {
-                                "name": "Puma",
-                                "petType": "Dog",
-                                "color": "Black",
-                                "gender": "Female",
-                                "breed": "Mixed",
-                            },
-                        },
-                        "frog": {"$ref": "#/components/examples/frog-example"},
-                    },
-                }
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            populate_by_name=True,
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            allow_population_by_field_name = True
+            schema_extra = {"examples": _examples}

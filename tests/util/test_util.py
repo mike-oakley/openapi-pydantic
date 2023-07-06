@@ -12,6 +12,7 @@ from openapi_pydantic import (
     RequestBody,
     Response,
 )
+from openapi_pydantic.compat import PYDANTIC_V2
 from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
 
 
@@ -24,7 +25,10 @@ def test_construct_open_api_with_schema_class_1() -> None:
     assert result_open_api_1.components == result_open_api_2.components
     assert result_open_api_1 == result_open_api_2
 
-    open_api_json = result_open_api_1.json(by_alias=True, exclude_none=True, indent=2)
+    dump_json = (
+        result_open_api_1.model_dump_json if PYDANTIC_V2 else result_open_api_1.json
+    )
+    open_api_json = dump_json(by_alias=True, exclude_none=True, indent=2)
     logging.debug(open_api_json)
 
 
@@ -66,7 +70,8 @@ def test_construct_open_api_with_schema_class_3() -> None:
 
 
 def construct_base_open_api_1() -> OpenAPI:
-    return OpenAPI.parse_obj(
+    model_validate = OpenAPI.model_validate if PYDANTIC_V2 else OpenAPI.parse_obj
+    return model_validate(
         {
             "info": {"title": "My own API", "version": "v0.0.1"},
             "paths": {
