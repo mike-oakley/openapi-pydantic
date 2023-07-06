@@ -85,6 +85,7 @@ from openapi_pydantic.compat import PYDANTIC_V2
 
 # Construct OpenAPI from dict, inferring the correct schema version
 open_api = parse_obj({
+    "openapi": "3.1.0",
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {
         "/ping": {
