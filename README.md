@@ -18,7 +18,6 @@ The naming of the classes follows the schema in
 
 ```python
 from openapi_pydantic import OpenAPI, Info, PathItem, Operation, Response
-from openapi_pydantic.compat import PYDANTIC_V2
 
 # Construct OpenAPI by pydantic objects
 open_api = OpenAPI(
@@ -38,10 +37,8 @@ open_api = OpenAPI(
         )
     },
 )
-if PYDANTIC_V2:
-    print(open_api.model_dump_json(by_alias=True, exclude_none=True, indent=2))
-else:
-    print(open_api.json(by_alias=True, exclude_none=True, indent=2))
+# Note: for Pydantic 1.x, replace `model_dump_json` with `json`
+print(open_api.model_dump_json(by_alias=True, exclude_none=True, indent=2))
 ```
 
 Result:
@@ -81,7 +78,6 @@ The following examples give the same OpenAPI result as above:
 
 ```python
 from openapi_pydantic import parse_obj, OpenAPI, PathItem, Response
-from openapi_pydantic.compat import PYDANTIC_V2
 
 # Construct OpenAPI from dict, inferring the correct schema version
 open_api = parse_obj({
@@ -96,8 +92,8 @@ open_api = parse_obj({
 
 
 # Construct OpenAPI v3.1.0 schema from dict
-openapi_validate = OpenAPI.model_validate if PYDANTIC_V2 else OpenAPI.parse_obj
-open_api = openapi_validate({
+# Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
+open_api = OpenAPI.model_validate({
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {
         "/ping": {
@@ -107,8 +103,8 @@ open_api = openapi_validate({
 })
 
 # Construct OpenAPI with mix of dict/object
-openapi_validate = OpenAPI.model_validate if PYDANTIC_V2 else OpenAPI.parse_obj
-open_api = openapi_validate({
+# Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
+open_api = OpenAPI.model_validate({
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {
         "/ping": PathItem(
@@ -134,12 +130,11 @@ The approach to deal with this:
 from pydantic import BaseModel, Field
 
 from openapi_pydantic import OpenAPI
-from openapi_pydantic.compat import PYDANTIC_V2
 from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
 
 def construct_base_open_api() -> OpenAPI:
-    openapi_validate = OpenAPI.model_validate if PYDANTIC_V2 else OpenAPI.parse_obj
-    return openapi_validate({
+    # Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
+    return OpenAPI.model_validate({
         "info": {"title": "My own API", "version": "v0.0.1"},
         "paths": {
             "/ping": {
@@ -172,10 +167,8 @@ open_api = construct_base_open_api()
 open_api = construct_open_api_with_schema_class(open_api)
 
 # print the result openapi.json
-if PYDANTIC_V2:
-    print(open_api.model_dump_json(by_alias=True, exclude_none=True, indent=2))
-else:
-    print(open_api.json(by_alias=True, exclude_none=True, indent=2))
+# Note: for Pydantic 1.x, replace `model_dump_json` with `json`
+print(open_api.model_dump_json(by_alias=True, exclude_none=True, indent=2))
 ```
 
 Result:
