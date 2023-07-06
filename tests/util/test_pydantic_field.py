@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
@@ -58,6 +58,9 @@ def construct_base_open_api() -> OpenAPI:
 
 def test_pydantic_discriminator_schema_generation() -> None:
     """https://github.com/kuimono/openapi-schema-pydantic/issues/8"""
+
+    a_kind: dict[str, Any]
+    b_kind: dict[str, Any]
 
     if PYDANTIC_V2:
         _key_map, json_schema = models_json_schema([(RequestModel, "validation")])
@@ -121,14 +124,18 @@ def test_pydantic_discriminator_openapi_generation() -> None:
         "data": Schema(
             oneOf=[
                 Reference(
-                    ref="#/components/schemas/DataAModel",
-                    summary=None,
-                    description=None,
+                    **{
+                        "$ref": "#/components/schemas/DataAModel",
+                        "summary": None,
+                        "description": None,
+                    }
                 ),
                 Reference(
-                    ref="#/components/schemas/DataBModel",
-                    summary=None,
-                    description=None,
+                    **{
+                        "$ref": "#/components/schemas/DataBModel",
+                        "summary": None,
+                        "description": None,
+                    }
                 ),
             ],
             title="Data",

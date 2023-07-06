@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Generic, List, Optional, Set, Type, TypeVar
+from typing import Any, Generic, List, Optional, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel
 
@@ -11,7 +11,7 @@ from openapi_pydantic.compat import (
     v1_schema,
 )
 
-from . import Components, OpenAPI, Reference, Schema
+from . import Components, OpenAPI, Reference, Schema, schema_validate
 
 logger = logging.getLogger(__name__)
 
@@ -32,13 +32,16 @@ def get_mode(
 ) -> JsonSchemaMode:
     """Get the JSON schema mode for a model class.
 
-    The mode can be either "serialization" or "validation". In validation mode,
+    The mode can be either "validation" or "serialization". In validation mode,
     computed fields are dropped and optional fields remain optional. In
     serialization mode, computed and optional fields are required.
     """
     if not hasattr(cls, "model_config"):
         return default
-    return cls.model_config.get("json_schema_mode", default)
+    mode = cls.model_config.get("json_schema_mode", default)
+    if mode not in ("validation", "serialization"):
+        raise ValueError(f"invalid json_schema_mode: {mode}")
+    return cast(JsonSchemaMode, mode)
 
 
 def construct_open_api_with_schema_class(
@@ -62,10 +65,8 @@ def construct_open_api_with_schema_class(
              If there is no update in "#/components/schemas" values, the original
              `open_api` will be returned.
     """
-    if PYDANTIC_V2:
-        new_open_api = open_api.model_copy(deep=True)
-    else:
-        new_open_api = open_api.copy(deep=True)
+    copy_func = getattr(open_api, "model_copy" if PYDANTIC_V2 else "copy")
+    new_open_api: OpenAPI = copy_func(deep=True)
 
     if scan_for_pydantic_schema_reference:
         extracted_schema_classes = _handle_pydantic_schema(new_open_api)
@@ -80,7 +81,7 @@ def construct_open_api_with_schema_class(
         return open_api
 
     schema_classes.sort(key=lambda x: x.__name__)
-    logger.debug(f"schema_classes{schema_classes}")
+    logger.debug("schema_classes: %s", schema_classes)
 
     # update new_open_api with new #/components/schemas
     if PYDANTIC_V2:
@@ -94,7 +95,6 @@ def construct_open_api_with_schema_class(
             schema_classes, by_alias=by_alias, ref_prefix=ref_prefix
         )
 
-    schema_validate = Schema.model_validate if PYDANTIC_V2 else Schema.parse_obj
     if not new_open_api.components:
         new_open_api.components = Components()
     if new_open_api.components.schemas:
@@ -111,6 +111,8 @@ def construct_open_api_with_schema_class(
             }
         )
     else:
+        for key, schema_dict in schema_definitions[DEFS_KEY].items():
+            schema_validate(schema_dict)
         new_open_api.components.schemas = {
             key: schema_validate(schema_dict)
             for key, schema_dict in schema_definitions[DEFS_KEY].items()
@@ -136,13 +138,13 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
 
     def _traverse(obj: Any) -> None:
         if isinstance(obj, BaseModel):
-            fields = obj.model_fields_set if PYDANTIC_V2 else obj.__fields_set__
+            fields = getattr(
+                obj, "model_fields_set" if PYDANTIC_V2 else "__fields_set__"
+            )
             for field in fields:
                 child_obj = obj.__getattribute__(field)
                 if isinstance(child_obj, PydanticSchema):
-                    logger.debug(
-                        f"PydanticSchema found in {obj.__repr_name__()}: {child_obj}"
-                    )
+                    logger.debug("PydanticSchema found in %s: %s", obj, child_obj)
                     obj.__setattr__(field, _construct_ref_obj(child_obj))
                     pydantic_types.add(child_obj.schema_class)
                 else:
@@ -169,6 +171,6 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
 
 
 def _construct_ref_obj(pydantic_schema: PydanticSchema[PydanticType]) -> Reference:
-    ref_obj = Reference(ref=ref_prefix + pydantic_schema.schema_class.__name__)
+    ref_obj = Reference(**{"$ref": ref_prefix + pydantic_schema.schema_class.__name__})
     logger.debug(f"ref_obj={ref_obj}")
     return ref_obj

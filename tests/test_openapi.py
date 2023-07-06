@@ -1,3 +1,5 @@
+from typing import Callable
+
 import pytest
 
 from openapi_pydantic.compat import PYDANTIC_V2
@@ -28,10 +30,10 @@ def test_parse_with_callback(version: str) -> None:
     }
 
     if version == "3.0.3":
-        model_validate = (
-            v3_0_3.OpenAPI.model_validate if PYDANTIC_V2 else v3_0_3.OpenAPI.parse_obj
+        model_validate_3_0: Callable[[dict], v3_0_3.OpenAPI] = getattr(
+            v3_0_3.OpenAPI, "model_validate" if PYDANTIC_V2 else "parse_obj"
         )
-        assert model_validate(data) == v3_0_3.OpenAPI(
+        assert model_validate_3_0(data) == v3_0_3.OpenAPI(
             info=v3_0_3.Info(title="API with Callback", version=""),
             paths={
                 "/create": v3_0_3.PathItem(
@@ -55,10 +57,10 @@ def test_parse_with_callback(version: str) -> None:
             },
         )
     else:
-        model_validate = (
-            v3_1_0.OpenAPI.model_validate if PYDANTIC_V2 else v3_1_0.OpenAPI.parse_obj
+        model_validate_3_1: Callable[[dict], v3_1_0.OpenAPI] = getattr(
+            v3_1_0.OpenAPI, "model_validate" if PYDANTIC_V2 else "parse_obj"
         )
-        assert model_validate(data) == v3_1_0.OpenAPI(
+        assert model_validate_3_1(data) == v3_1_0.OpenAPI(
             info=v3_1_0.Info(title="API with Callback", version=""),
             paths={
                 "/create": v3_1_0.PathItem(

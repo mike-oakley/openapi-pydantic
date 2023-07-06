@@ -31,3 +31,4 @@ from .v3_1_0 import SecurityScheme as SecurityScheme
 from .v3_1_0 import Server as Server
 from .v3_1_0 import ServerVariable as ServerVariable
 from .v3_1_0 import Tag as Tag
+from .v3_1_0 import schema_validate as schema_validate

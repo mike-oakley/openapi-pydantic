@@ -1,8 +1,8 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
-from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra, min_length_arg
 
 from .datatype import DataType
 from .discriminator import Discriminator
@@ -477,11 +477,7 @@ class Schema(BaseModel):
     sets listed for this keyword.
     """
 
-    enum: Optional[List[Any]] = (
-        Field(default=None, min_length=1)
-        if PYDANTIC_V2
-        else Field(default=None, min_items=1)
-    )
+    enum: Optional[List[Any]] = Field(default=None, **min_length_arg(1))
     """
     The value of this keyword MUST be an array.  This array SHOULD have
     at least one element.  Elements in the array SHOULD be unique.
@@ -956,3 +952,21 @@ class Schema(BaseModel):
             extra = Extra.allow
             allow_population_by_field_name = True
             schema_extra = {"examples": _examples}
+
+
+if TYPE_CHECKING:
+
+    def schema_validate(
+        obj: Any,
+        *,
+        strict: bool | None = None,
+        from_attributes: bool | None = None,
+        context: dict[str, Any] | None = None
+    ) -> Schema:
+        ...
+
+elif PYDANTIC_V2:
+    schema_validate = Schema.model_validate
+
+else:
+    schema_validate = Schema.parse_obj

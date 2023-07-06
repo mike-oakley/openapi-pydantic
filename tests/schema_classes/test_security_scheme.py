@@ -7,12 +7,13 @@ def test_oidc_parsing() -> None:
         type="openIdConnect", openIdConnectUrl="https://example.com/openIdConnect"
     )
     assert isinstance(security_scheme_1.openIdConnectUrl, str)
+    dump1 = getattr(security_scheme_1, "model_dump_json" if PYDANTIC_V2 else "json")
     if PYDANTIC_V2:
-        assert security_scheme_1.model_dump_json(by_alias=True, exclude_none=True) == (
+        assert dump1(by_alias=True, exclude_none=True) == (
             '{"type":"openIdConnect","openIdConnectUrl":"https://example.com/openIdConnect"}'
         )
     else:
-        assert security_scheme_1.json(by_alias=True, exclude_none=True) == (
+        assert dump1(by_alias=True, exclude_none=True) == (
             '{"type": "openIdConnect", "openIdConnectUrl": "https://example.com/openIdConnect"}'
         )
 
@@ -20,12 +21,13 @@ def test_oidc_parsing() -> None:
         type="openIdConnect", openIdConnectUrl="/openIdConnect"
     )
     assert isinstance(security_scheme_2.openIdConnectUrl, str)
+    dump2 = getattr(security_scheme_2, "model_dump_json" if PYDANTIC_V2 else "json")
     if PYDANTIC_V2:
-        assert security_scheme_2.model_dump_json(by_alias=True, exclude_none=True) == (
+        assert dump2(by_alias=True, exclude_none=True) == (
             '{"type":"openIdConnect","openIdConnectUrl":"/openIdConnect"}'
         )
     else:
-        assert security_scheme_2.json(by_alias=True, exclude_none=True) == (
+        assert dump2(by_alias=True, exclude_none=True) == (
             '{"type": "openIdConnect", "openIdConnectUrl": "/openIdConnect"}'
         )
 
@@ -33,11 +35,12 @@ def test_oidc_parsing() -> None:
         type="openIdConnect", openIdConnectUrl="openIdConnect"
     )
     assert isinstance(security_scheme_3.openIdConnectUrl, str)
+    dump3 = getattr(security_scheme_3, "model_dump_json" if PYDANTIC_V2 else "json")
     if PYDANTIC_V2:
-        assert security_scheme_3.model_dump_json(by_alias=True, exclude_none=True) == (
+        assert dump3(by_alias=True, exclude_none=True) == (
             '{"type":"openIdConnect","openIdConnectUrl":"openIdConnect"}'
         )
     else:
-        assert security_scheme_3.json(by_alias=True, exclude_none=True) == (
+        assert dump3(by_alias=True, exclude_none=True) == (
             '{"type": "openIdConnect", "openIdConnectUrl": "openIdConnect"}'
         )

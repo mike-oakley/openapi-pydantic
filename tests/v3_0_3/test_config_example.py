@@ -89,5 +89,5 @@ def _assert_config_examples(schema_type: Any) -> None:
         if schema_extra is not None:
             examples = schema_extra["examples"]
             for example_dict in examples:
-                obj = schema_type(**example_dict)  # type: ignore[operator]
+                obj = schema_type(**example_dict)
                 assert obj.__fields_set__

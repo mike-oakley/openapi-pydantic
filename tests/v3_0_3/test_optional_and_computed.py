@@ -18,7 +18,7 @@ from openapi_pydantic.v3.v3_0_3.util import (
 
 
 @pytest.mark.skipif(not PYDANTIC_V2, reason="computed fields require Pydantic V2")
-def test_optional_and_computed_fields():
+def test_optional_and_computed_fields() -> None:
     api = construct_sample_api()
 
     result = construct_open_api_with_schema_class(api)
@@ -55,7 +55,17 @@ def test_optional_and_computed_fields():
 
 
 def construct_sample_api() -> OpenAPI:
-    from pydantic import BaseModel, ConfigDict, computed_field
+    from typing import TYPE_CHECKING, Callable
+
+    from pydantic import BaseModel, ConfigDict
+
+    if TYPE_CHECKING:
+
+        def computed_field(x: Callable) -> Callable:
+            ...
+
+    else:
+        from pydantic import computed_field
 
     class ConfigDictExt(ConfigDict, total=False):
         json_schema_mode: JsonSchemaMode
@@ -64,7 +74,7 @@ def construct_sample_api() -> OpenAPI:
         req: bool
         opt: bool | None = None
 
-        @computed_field
+        @computed_field  # type: ignore
         @property
         def comp(self) -> bool:
             return True

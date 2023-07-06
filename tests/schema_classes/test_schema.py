@@ -2,7 +2,7 @@ import logging
 
 from pydantic import BaseModel
 
-from openapi_pydantic import Reference, Schema
+from openapi_pydantic import Reference, schema_validate
 from openapi_pydantic.compat import (
     DEFS_KEY,
     PYDANTIC_V2,
@@ -14,7 +14,6 @@ from openapi_pydantic.compat import (
 
 
 def test_schema() -> None:
-    schema_validate = Schema.model_validate if PYDANTIC_V2 else Schema.parse_obj
     schema = schema_validate(
         {
             "title": "reference list",
@@ -61,6 +60,5 @@ def test_additional_properties_is_bool() -> None:
     }
 
     # allow "additionalProperties" to have boolean value
-    schema_validate = Schema.model_validate if PYDANTIC_V2 else Schema.parse_obj
     result = schema_validate(schema_definition[DEFS_KEY]["TestModel"])
     assert result.additionalProperties is False
