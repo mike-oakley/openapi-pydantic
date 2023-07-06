@@ -101,6 +101,7 @@ else:
 
 
 __all__ = [
+    "PYDANTIC_V2",
     "Literal",
     "ConfigDict",
     "JsonSchemaMode",
