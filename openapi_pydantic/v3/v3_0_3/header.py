@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import Field
 
-from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra, Literal
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .parameter import Parameter, ParameterLocation
 
@@ -34,6 +34,8 @@ if TYPE_CHECKING:
         )
 
 elif PYDANTIC_V2:
+    from typing import Literal
+
     LiteralEmptyString = Literal[""]
 
     class Header(Parameter):

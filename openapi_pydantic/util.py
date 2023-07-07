@@ -104,20 +104,21 @@ def construct_open_api_with_schema_class(
                     f'"{existing_key}" already exists in {ref_prefix}. '
                     f'The value of "{ref_prefix}{existing_key}" will be overwritten.'
                 )
-        new_open_api.components.schemas.update(
-            {
-                key: schema_validate(schema_dict)
-                for key, schema_dict in schema_definitions[DEFS_KEY].items()
-            }
-        )
+        new_open_api.components.schemas.update(_validate_schemas(schema_definitions))
     else:
-        for key, schema_dict in schema_definitions[DEFS_KEY].items():
-            schema_validate(schema_dict)
-        new_open_api.components.schemas = {
-            key: schema_validate(schema_dict)
-            for key, schema_dict in schema_definitions[DEFS_KEY].items()
-        }
+        new_open_api.components.schemas = _validate_schemas(schema_definitions)
     return new_open_api
+
+
+def _validate_schemas(schema_definitions: dict[str, Any]) -> dict[str, Schema]:
+    """Convert JSON Schema definitions to parsed OpenAPI objects"""
+    # Note: if an error occurs in schema_validate(), it may indicate that
+    # the generated JSON schemas are not compatible with the version
+    # of OpenAPI this module depends on.
+    return {
+        key: schema_validate(schema_dict)
+        for key, schema_dict in schema_definitions[DEFS_KEY].items()
+    }
 
 
 def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:

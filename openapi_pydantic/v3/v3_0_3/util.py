@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Generic, List, Optional, Set, Type, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Generic, List, Optional, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel
 
@@ -42,6 +42,36 @@ def get_mode(
     if mode not in ("validation", "serialization"):
         raise ValueError(f"invalid json_schema_mode: {mode}")
     return cast(JsonSchemaMode, mode)
+
+
+if TYPE_CHECKING:
+
+    class GenerateOpenAPI30Schema:
+        ...
+
+elif PYDANTIC_V2:
+    from pydantic.json_schema import GenerateJsonSchema, JsonSchemaValue
+    from pydantic_core import core_schema
+
+    class GenerateOpenAPI30Schema(GenerateJsonSchema):
+        """Modify the schema generation for OpenAPI 3.0.
+
+        In OpenAPI 3.0, types can not be None, but a special "nullable"
+        field is available.
+        """
+
+        def nullable_schema(
+            self,
+            schema: core_schema.NullableSchema,
+        ) -> JsonSchemaValue:
+            inner_json_schema = self.generate_inner(schema["schema"])
+            inner_json_schema["nullable"] = True
+            return inner_json_schema
+
+else:
+
+    class GenerateOpenAPI30Schema:
+        ...
 
 
 def construct_open_api_with_schema_class(
@@ -89,6 +119,7 @@ def construct_open_api_with_schema_class(
             [(c, get_mode(c)) for c in schema_classes],
             by_alias=by_alias,
             ref_template=ref_template,
+            schema_generator=GenerateOpenAPI30Schema,
         )
     else:
         schema_definitions = v1_schema(
@@ -104,20 +135,23 @@ def construct_open_api_with_schema_class(
                     f'"{existing_key}" already exists in {ref_prefix}. '
                     f'The value of "{ref_prefix}{existing_key}" will be overwritten.'
                 )
-        new_open_api.components.schemas.update(
-            {
-                key: schema_validate(schema_dict)
-                for key, schema_dict in schema_definitions[DEFS_KEY].items()
-            }
-        )
+        new_open_api.components.schemas.update(_validate_schemas(schema_definitions))
     else:
-        for key, schema_dict in schema_definitions[DEFS_KEY].items():
-            schema_validate(schema_dict)
-        new_open_api.components.schemas = {
-            key: schema_validate(schema_dict)
-            for key, schema_dict in schema_definitions[DEFS_KEY].items()
-        }
+        new_open_api.components.schemas = _validate_schemas(schema_definitions)
     return new_open_api
+
+
+def _validate_schemas(
+    schema_definitions: dict[str, Any]
+) -> dict[str, Reference | Schema]:
+    """Convert JSON Schema definitions to parsed OpenAPI objects"""
+    # Note: if an error occurs in schema_validate(), it may indicate that
+    # the generated JSON schemas are not compatible with the version
+    # of OpenAPI this module depends on.
+    return {
+        key: schema_validate(schema_dict)
+        for key, schema_dict in schema_definitions[DEFS_KEY].items()
+    }
 
 
 def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:

@@ -4,6 +4,18 @@ from typing import TYPE_CHECKING
 
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
+__all__ = [
+    "PYDANTIC_V2",
+    "ConfigDict",
+    "JsonSchemaMode",
+    "models_json_schema",
+    "RootModel",
+    "Extra",
+    "v1_schema",
+    "DEFS_KEY",
+    "min_length_arg",
+]
+
 PYDANTIC_MAJOR_VERSION = int(PYDANTIC_VERSION.split(".", 1)[0])
 PYDANTIC_V2 = PYDANTIC_MAJOR_VERSION >= 2
 
@@ -21,15 +33,18 @@ if TYPE_CHECKING:
         json_schema_extra: dict[str, Any] | None = None,
         populate_by_name: bool = True,
     ) -> PydanticConfigDict:
+        """Stub for pydantic.ConfigDict in Pydantic 2"""
         ...
 
     class Extra(Enum):
+        """Stub for pydantic.Extra in Pydantic 1"""
+
         allow = "allow"
         ignore = "ignore"
         forbid = "forbid"
 
     class RootModel(BaseModel):
-        ...
+        """Stub for pydantic.RootModel in Pydantic 2"""
 
     JsonSchemaMode = Literal["validation", "serialization"]
 
@@ -38,7 +53,9 @@ if TYPE_CHECKING:
         *,
         by_alias: bool = True,
         ref_template: str = "#/$defs/{model}",
+        schema_generator: type | None = None,
     ) -> tuple[dict, dict[str, Any]]:
+        """Stub for pydantic.json_schema.models_json_schema in Pydantic 2"""
         ...
 
     def v1_schema(
@@ -47,6 +64,7 @@ if TYPE_CHECKING:
         by_alias: bool = True,
         ref_prefix: str = "#/$defs",
     ) -> dict[str, Any]:
+        """Stub for pydantic.schema.schema in Pydantic 1"""
         ...
 
     DEFS_KEY = "$defs"
@@ -55,10 +73,11 @@ if TYPE_CHECKING:
         pass
 
     def min_length_arg(min_length: int) -> MinLengthArg:
+        """Generate a min_length or min_items parameter for Field(...)"""
         ...
 
 elif PYDANTIC_V2:
-    from typing import Literal, TypedDict
+    from typing import TypedDict
 
     from pydantic import ConfigDict, RootModel
     from pydantic.json_schema import JsonSchemaMode, models_json_schema
@@ -72,7 +91,7 @@ elif PYDANTIC_V2:
     def min_length_arg(min_length: int) -> MinLengthArg:
         return {"min_length": min_length}
 
-    # Create V1 stubs
+    # Create V1 stubs, These should not be used when PYDANTIC_V2 is true.
     Extra = None
     v1_schema = None
 
@@ -92,23 +111,8 @@ else:
     def min_length_arg(min_length: int) -> MinLengthArg:
         return {"min_items": min_length}
 
-    # Create V2 stubs
+    # Create V2 stubs. These should not be used when PYDANTIC_V2 is false.
     ConfigDict = None
-    Literal = None
     models_json_schema = None
     JsonSchemaMode = None
     RootModel = None
-
-
-__all__ = [
-    "PYDANTIC_V2",
-    "Literal",
-    "ConfigDict",
-    "JsonSchemaMode",
-    "models_json_schema",
-    "RootModel",
-    "Extra",
-    "v1_schema",
-    "DEFS_KEY",
-    "min_length_arg",
-]
