@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/openapi-pydantic)](https://pypi.org/project/openapi-pydantic/)
 [![PyPI - License](https://img.shields.io/pypi/l/openapi-pydantic)](https://github.com/mike-oakley/openapi-pydantic/blob/main/LICENSE)
 
-OpenAPI schema implemented in [Pydantic](https://github.com/samuelcolvin/pydantic).
+OpenAPI schema implemented in [Pydantic](https://github.com/samuelcolvin/pydantic). Both Pydantic 1.8+ and 2.x are supported.
 
 The naming of the classes follows the schema in 
 [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md#schema).
@@ -308,6 +308,10 @@ The old 3.0.3 version is available by importing from different paths:
 from openapi_pydantic.v3.v3_0_3 import OpenAPI, ...
 from openapi_pydantic.v3.v3_0_3.util import PydanticSchema, construct_open_api_with_schema_class
 ```
+
+### Pydantic version compatibility
+
+Compatibility with both major versions of Pydantic (1.8+ and 2.*) is mostly achieved using a module called `compat.py`. It detects the installed version of Pydantic and exports version-specific symbols for use by the rest of the package. It also provides all symbols necessary for type checking. The `compat.py` module is not intended to be imported by other packages, but other packages may find it helpful as an example of how to span major versions of Pydantic.
 
 ## Credits
 
