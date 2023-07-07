@@ -1,15 +1,23 @@
 import logging
-from typing import Any, Generic, List, Optional, Set, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, List, Optional, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel
-from pydantic.schema import schema
 
-from . import Components, OpenAPI, Reference, Schema
+from openapi_pydantic.compat import (
+    DEFS_KEY,
+    PYDANTIC_V2,
+    JsonSchemaMode,
+    models_json_schema,
+    v1_schema,
+)
+
+from . import Components, OpenAPI, Reference, Schema, schema_validate
 
 logger = logging.getLogger(__name__)
 
 PydanticType = TypeVar("PydanticType", bound=BaseModel)
 ref_prefix = "#/components/schemas/"
+ref_template = "#/components/schemas/{model}"
 
 
 class PydanticSchema(Schema, Generic[PydanticType]):
@@ -17,6 +25,53 @@ class PydanticSchema(Schema, Generic[PydanticType]):
 
     schema_class: Type[PydanticType]
     """the class that is used for generate the schema"""
+
+
+def get_mode(
+    cls: Type[BaseModel], default: JsonSchemaMode = "validation"
+) -> JsonSchemaMode:
+    """Get the JSON schema mode for a model class.
+
+    The mode can be either "validation" or "serialization". In validation mode,
+    computed fields are dropped and optional fields remain optional. In
+    serialization mode, computed and optional fields are required.
+    """
+    if not hasattr(cls, "model_config"):
+        return default
+    mode = cls.model_config.get("json_schema_mode", default)
+    if mode not in ("validation", "serialization"):
+        raise ValueError(f"invalid json_schema_mode: {mode}")
+    return cast(JsonSchemaMode, mode)
+
+
+if TYPE_CHECKING:
+
+    class GenerateOpenAPI30Schema:
+        ...
+
+elif PYDANTIC_V2:
+    from pydantic.json_schema import GenerateJsonSchema, JsonSchemaValue
+    from pydantic_core import core_schema
+
+    class GenerateOpenAPI30Schema(GenerateJsonSchema):
+        """Modify the schema generation for OpenAPI 3.0.
+
+        In OpenAPI 3.0, types can not be None, but a special "nullable"
+        field is available.
+        """
+
+        def nullable_schema(
+            self,
+            schema: core_schema.NullableSchema,
+        ) -> JsonSchemaValue:
+            inner_json_schema = self.generate_inner(schema["schema"])
+            inner_json_schema["nullable"] = True
+            return inner_json_schema
+
+else:
+
+    class GenerateOpenAPI30Schema:
+        ...
 
 
 def construct_open_api_with_schema_class(
@@ -40,7 +95,9 @@ def construct_open_api_with_schema_class(
              If there is no update in "#/components/schemas" values, the original
              `open_api` will be returned.
     """
-    new_open_api: OpenAPI = open_api.copy(deep=True)
+    copy_func = getattr(open_api, "model_copy" if PYDANTIC_V2 else "copy")
+    new_open_api: OpenAPI = copy_func(deep=True)
+
     if scan_for_pydantic_schema_reference:
         extracted_schema_classes = _handle_pydantic_schema(new_open_api)
         if schema_classes:
@@ -54,33 +111,47 @@ def construct_open_api_with_schema_class(
         return open_api
 
     schema_classes.sort(key=lambda x: x.__name__)
-    logger.debug(f"schema_classes{schema_classes}")
+    logger.debug("schema_classes: %s", schema_classes)
 
     # update new_open_api with new #/components/schemas
-    schema_definitions = schema(
-        schema_classes, by_alias=by_alias, ref_prefix=ref_prefix
-    )
+    if PYDANTIC_V2:
+        _key_map, schema_definitions = models_json_schema(
+            [(c, get_mode(c)) for c in schema_classes],
+            by_alias=by_alias,
+            ref_template=ref_template,
+            schema_generator=GenerateOpenAPI30Schema,
+        )
+    else:
+        schema_definitions = v1_schema(
+            schema_classes, by_alias=by_alias, ref_prefix=ref_prefix
+        )
+
     if not new_open_api.components:
         new_open_api.components = Components()
     if new_open_api.components.schemas:
         for existing_key in new_open_api.components.schemas:
-            if existing_key in schema_definitions["definitions"]:
+            if existing_key in schema_definitions[DEFS_KEY]:
                 logger.warning(
                     f'"{existing_key}" already exists in {ref_prefix}. '
                     f'The value of "{ref_prefix}{existing_key}" will be overwritten.'
                 )
-        new_open_api.components.schemas.update(
-            {
-                key: Schema.parse_obj(schema_dict)
-                for key, schema_dict in schema_definitions["definitions"].items()
-            }
-        )
+        new_open_api.components.schemas.update(_validate_schemas(schema_definitions))
     else:
-        new_open_api.components.schemas = {
-            key: Schema.parse_obj(schema_dict)
-            for key, schema_dict in schema_definitions["definitions"].items()
-        }
+        new_open_api.components.schemas = _validate_schemas(schema_definitions)
     return new_open_api
+
+
+def _validate_schemas(
+    schema_definitions: dict[str, Any]
+) -> dict[str, Reference | Schema]:
+    """Convert JSON Schema definitions to parsed OpenAPI objects"""
+    # Note: if an error occurs in schema_validate(), it may indicate that
+    # the generated JSON schemas are not compatible with the version
+    # of OpenAPI this module depends on.
+    return {
+        key: schema_validate(schema_dict)
+        for key, schema_dict in schema_definitions[DEFS_KEY].items()
+    }
 
 
 def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
@@ -101,13 +172,13 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
 
     def _traverse(obj: Any) -> None:
         if isinstance(obj, BaseModel):
-            fields = obj.__fields_set__
+            fields = getattr(
+                obj, "model_fields_set" if PYDANTIC_V2 else "__fields_set__"
+            )
             for field in fields:
                 child_obj = obj.__getattribute__(field)
                 if isinstance(child_obj, PydanticSchema):
-                    logger.debug(
-                        f"PydanticSchema found in {obj.__repr_name__()}: {child_obj}"
-                    )
+                    logger.debug("PydanticSchema found in %s: %s", obj, child_obj)
                     obj.__setattr__(field, _construct_ref_obj(child_obj))
                     pydantic_types.add(child_obj.schema_class)
                 else:
@@ -134,6 +205,6 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
 
 
 def _construct_ref_obj(pydantic_schema: PydanticSchema[PydanticType]) -> Reference:
-    ref_obj = Reference(ref=ref_prefix + pydantic_schema.schema_class.__name__)
+    ref_obj = Reference(**{"$ref": ref_prefix + pydantic_schema.schema_class.__name__})
     logger.debug(f"ref_obj={ref_obj}")
     return ref_obj

@@ -1,9 +1,30 @@
 from typing import Optional
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .contact import Contact
 from .license import License
+
+_examples = [
+    {
+        "title": "Sample Pet Store App",
+        "summary": "A pet store manager.",
+        "description": "This is a sample server for a pet store.",
+        "termsOfService": "http://example.com/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.example.com/support",
+            "email": "support@example.com",
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+        },
+        "version": "1.0.1",
+    }
+]
 
 
 class Info(BaseModel):
@@ -53,25 +74,14 @@ class Info(BaseModel):
     implementation version).
     """
 
-    class Config:
-        extra = Extra.allow
-        schema_extra = {
-            "examples": [
-                {
-                    "title": "Sample Pet Store App",
-                    "summary": "A pet store manager.",
-                    "description": "This is a sample server for a pet store.",
-                    "termsOfService": "http://example.com/terms/",
-                    "contact": {
-                        "name": "API Support",
-                        "url": "http://www.example.com/support",
-                        "email": "support@example.com",
-                    },
-                    "license": {
-                        "name": "Apache 2.0",
-                        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
-                    },
-                    "version": "1.0.1",
-                }
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            schema_extra = {"examples": _examples}

@@ -1,6 +1,8 @@
 from typing import Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .components import Components
 from .external_documentation import ExternalDocumentation
@@ -91,5 +93,12 @@ class OpenAPI(BaseModel):
     Additional external documentation.
     """
 
-    class Config:
-        extra = Extra.allow
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow

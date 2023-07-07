@@ -1,11 +1,52 @@
 from typing import Dict, Optional, Union
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .header import Header
 from .link import Link
 from .media_type import MediaType
 from .reference import Reference
+
+_examples = [
+    {
+        "description": "A complex object array response",
+        "content": {
+            "application/json": {
+                "schema": {
+                    "type": "array",
+                    "items": {"$ref": "#/components/schemas/VeryComplexType"},
+                }
+            }
+        },
+    },
+    {
+        "description": "A simple string response",
+        "content": {"text/plain": {"schema": {"type": "string"}}},
+    },
+    {
+        "description": "A simple string response",
+        "content": {"text/plain": {"schema": {"type": "string", "example": "whoa!"}}},
+        "headers": {
+            "X-Rate-Limit-Limit": {
+                "description": "The number of allowed requests in the "
+                "current period",
+                "schema": {"type": "integer"},
+            },
+            "X-Rate-Limit-Remaining": {
+                "description": "The number of remaining requests in the "
+                "current period",
+                "schema": {"type": "integer"},
+            },
+            "X-Rate-Limit-Reset": {
+                "description": "The number of seconds left in the current period",
+                "schema": {"type": "integer"},
+            },
+        },
+    },
+    {"description": "object created"},
+]
 
 
 class Response(BaseModel):
@@ -46,50 +87,14 @@ class Response(BaseModel):
     of the names for [Component Objects](#componentsObject).
     """
 
-    class Config:
-        extra = Extra.allow
-        schema_extra = {
-            "examples": [
-                {
-                    "description": "A complex object array response",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/VeryComplexType"
-                                },
-                            }
-                        }
-                    },
-                },
-                {
-                    "description": "A simple string response",
-                    "content": {"text/plain": {"schema": {"type": "string"}}},
-                },
-                {
-                    "description": "A simple string response",
-                    "content": {
-                        "text/plain": {"schema": {"type": "string", "example": "whoa!"}}
-                    },
-                    "headers": {
-                        "X-Rate-Limit-Limit": {
-                            "description": "The number of allowed requests in the "
-                            "current period",
-                            "schema": {"type": "integer"},
-                        },
-                        "X-Rate-Limit-Remaining": {
-                            "description": "The number of remaining requests in the "
-                            "current period",
-                            "schema": {"type": "integer"},
-                        },
-                        "X-Rate-Limit-Reset": {
-                            "description": "The number of seconds left in the current "
-                            "period",
-                            "schema": {"type": "integer"},
-                        },
-                    },
-                },
-                {"description": "object created"},
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            schema_extra = {"examples": _examples}

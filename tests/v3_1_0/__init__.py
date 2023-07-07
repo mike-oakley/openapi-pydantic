@@ -1,6 +1,6 @@
-from openapi_pydantic.v3.v3_1_0.schema import Schema
+from openapi_pydantic.v3.v3_1_0.schema import Schema, schema_validate
 
 
 def test_empty_schema() -> None:
-    schema = Schema.parse_obj({})
+    schema = schema_validate({})
     assert schema == Schema()

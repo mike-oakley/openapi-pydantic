@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/openapi-pydantic)](https://pypi.org/project/openapi-pydantic/)
 [![PyPI - License](https://img.shields.io/pypi/l/openapi-pydantic)](https://github.com/mike-oakley/openapi-pydantic/blob/main/LICENSE)
 
-OpenAPI schema implemented in [Pydantic](https://github.com/samuelcolvin/pydantic).
+OpenAPI schema implemented in [Pydantic](https://github.com/samuelcolvin/pydantic). Both Pydantic 1.8+ and 2.x are supported.
 
 The naming of the classes follows the schema in 
 [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md#schema).
@@ -37,7 +37,8 @@ open_api = OpenAPI(
         )
     },
 )
-print(open_api.json(by_alias=True, exclude_none=True, indent=2))
+# Note: for Pydantic 1.x, replace `model_dump_json` with `json`
+print(open_api.model_dump_json(by_alias=True, exclude_none=True, indent=2))
 ```
 
 Result:
@@ -71,7 +72,7 @@ Result:
 
 ## Take advantage of Pydantic
 
-Pydantic is a great tool, allow you to use object / dict / mixed data for for input.
+Pydantic is a great tool. It allows you to use object / dict / mixed data for input.
 
 The following examples give the same OpenAPI result as above:
 
@@ -80,6 +81,7 @@ from openapi_pydantic import parse_obj, OpenAPI, PathItem, Response
 
 # Construct OpenAPI from dict, inferring the correct schema version
 open_api = parse_obj({
+    "openapi": "3.1.0",
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {
         "/ping": {
@@ -90,7 +92,8 @@ open_api = parse_obj({
 
 
 # Construct OpenAPI v3.1.0 schema from dict
-open_api = OpenAPI.parse_obj({
+# Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
+open_api = OpenAPI.model_validate({
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {
         "/ping": {
@@ -100,7 +103,8 @@ open_api = OpenAPI.parse_obj({
 })
 
 # Construct OpenAPI with mix of dict/object
-open_api = OpenAPI.parse_obj({
+# Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
+open_api = OpenAPI.model_validate({
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {
         "/ping": PathItem(
@@ -113,10 +117,10 @@ open_api = OpenAPI.parse_obj({
 ## Use Pydantic classes as schema
 
 - The [Schema Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md#schemaObject)
-  in OpenAPI has definitions and tweaks in JSON Schema, which is hard to comprehend and define a good data class
-- Pydantic already has a good way to [create JSON schema](https://pydantic-docs.helpmanual.io/usage/schema/),
-  let's not re-invent the wheel
-  
+  in OpenAPI has definitions and tweaks in JSON Schema, which are hard to comprehend and define a good data class
+- Pydantic already has a good way to [create JSON schema](https://pydantic-docs.helpmanual.io/usage/schema/).
+  Let's not reinvent the wheel.
+
 The approach to deal with this:
 
 1. Use `PydanticSchema` objects to represent the `Schema` in `OpenAPI` object
@@ -129,7 +133,8 @@ from openapi_pydantic import OpenAPI
 from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
 
 def construct_base_open_api() -> OpenAPI:
-    return OpenAPI.parse_obj({
+    # Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
+    return OpenAPI.model_validate({
         "info": {"title": "My own API", "version": "v0.0.1"},
         "paths": {
             "/ping": {
@@ -162,7 +167,8 @@ open_api = construct_base_open_api()
 open_api = construct_open_api_with_schema_class(open_api)
 
 # print the result openapi.json
-print(open_api.json(by_alias=True, exclude_none=True, indent=2))
+# Note: for Pydantic 1.x, replace `model_dump_json` with `json`
+print(open_api.model_dump_json(by_alias=True, exclude_none=True, indent=2))
 ```
 
 Result:
@@ -259,21 +265,24 @@ Result:
 
 ## Notes
 
-### Use of OpenAPI.json() / OpenAPI.dict()
+### Use of OpenAPI.model_dump() / OpenAPI.model_dump_json() / OpenAPI.json() / OpenAPI.dict()
 
-When using `OpenAPI.json()` / `OpenAPI.dict()` function,
-arguments `by_alias=True, exclude_none=True` has to be in place.
-Otherwise the result json will not fit the OpenAPI standard.
+When using `OpenAPI.model_dump()` / `OpenAPI.model_dump_json()` / `OpenAPI.json()` / `OpenAPI.dict()` functions,
+the arguments `by_alias=True, exclude_none=True` have to be in place.
+Otherwise the resulting json will not fit the OpenAPI standard.
 
 ```python
-# OK
+# OK (Pydantic 2)
+open_api.model_dump_json(by_alias=True, exclude_none=True, indent=2)
+# OK (Pydantic 1)
 open_api.json(by_alias=True, exclude_none=True, indent=2)
 
 # Not good
+open_api.model_dump_json(indent=2)
 open_api.json(indent=2)
 ```
 
-More info about field alias:
+More info about field aliases:
 
 | OpenAPI version | Field alias info |
 | --------------- | ---------------- |
@@ -293,12 +302,16 @@ Please refer to the following for more info:
 ### Use OpenAPI 3.0.3 instead of 3.1.0
 
 Some UI renderings (e.g. Swagger) still do not support OpenAPI 3.1.0.
-It is allowed to use the old 3.0.3 version by importing from different paths:
+The old 3.0.3 version is available by importing from different paths:
 
 ```python
 from openapi_pydantic.v3.v3_0_3 import OpenAPI, ...
 from openapi_pydantic.v3.v3_0_3.util import PydanticSchema, construct_open_api_with_schema_class
 ```
+
+### Pydantic version compatibility
+
+Compatibility with both major versions of Pydantic (1.8+ and 2.*) is mostly achieved using a module called `compat.py`. It detects the installed version of Pydantic and exports version-specific symbols for use by the rest of the package. It also provides all symbols necessary for type checking. The `compat.py` module is not intended to be imported by other packages, but other packages may find it helpful as an example of how to span major versions of Pydantic.
 
 ## Credits
 

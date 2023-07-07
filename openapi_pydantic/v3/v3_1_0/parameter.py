@@ -1,12 +1,69 @@
 import enum
 from typing import Any, Dict, Optional, Union
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .example import Example
 from .media_type import MediaType
 from .reference import Reference
 from .schema import Schema
+
+_examples = [
+    {
+        "name": "token",
+        "in": "header",
+        "description": "token to be passed as a header",
+        "required": True,
+        "schema": {
+            "type": "array",
+            "items": {"type": "integer", "format": "int64"},
+        },
+        "style": "simple",
+    },
+    {
+        "name": "username",
+        "in": "path",
+        "description": "username to fetch",
+        "required": True,
+        "schema": {"type": "string"},
+    },
+    {
+        "name": "id",
+        "in": "query",
+        "description": "ID of the object to fetch",
+        "required": False,
+        "schema": {"type": "array", "items": {"type": "string"}},
+        "style": "form",
+        "explode": True,
+    },
+    {
+        "in": "query",
+        "name": "freeForm",
+        "schema": {
+            "type": "object",
+            "additionalProperties": {"type": "integer"},
+        },
+        "style": "form",
+    },
+    {
+        "in": "query",
+        "name": "coordinates",
+        "content": {
+            "application/json": {
+                "schema": {
+                    "type": "object",
+                    "required": ["lat", "long"],
+                    "properties": {
+                        "lat": {"type": "number"},
+                        "long": {"type": "number"},
+                    },
+                }
+            }
+        },
+    },
+]
 
 
 class ParameterLocation(str, enum.Enum):
@@ -161,62 +218,16 @@ class Parameter(BaseModel):
     The map MUST only contain one entry.
     """
 
-    class Config:
-        extra = Extra.allow
-        allow_population_by_field_name = True
-        schema_extra = {
-            "examples": [
-                {
-                    "name": "token",
-                    "in": "header",
-                    "description": "token to be passed as a header",
-                    "required": True,
-                    "schema": {
-                        "type": "array",
-                        "items": {"type": "integer", "format": "int64"},
-                    },
-                    "style": "simple",
-                },
-                {
-                    "name": "username",
-                    "in": "path",
-                    "description": "username to fetch",
-                    "required": True,
-                    "schema": {"type": "string"},
-                },
-                {
-                    "name": "id",
-                    "in": "query",
-                    "description": "ID of the object to fetch",
-                    "required": False,
-                    "schema": {"type": "array", "items": {"type": "string"}},
-                    "style": "form",
-                    "explode": True,
-                },
-                {
-                    "in": "query",
-                    "name": "freeForm",
-                    "schema": {
-                        "type": "object",
-                        "additionalProperties": {"type": "integer"},
-                    },
-                    "style": "form",
-                },
-                {
-                    "in": "query",
-                    "name": "coordinates",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": ["lat", "long"],
-                                "properties": {
-                                    "lat": {"type": "number"},
-                                    "long": {"type": "number"},
-                                },
-                            }
-                        }
-                    },
-                },
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            populate_by_name=True,
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            allow_population_by_field_name = True
+            schema_extra = {"examples": _examples}

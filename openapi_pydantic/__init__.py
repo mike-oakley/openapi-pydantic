@@ -33,5 +33,6 @@ from .v3 import Server as Server
 from .v3 import ServerVariable as ServerVariable
 from .v3 import Tag as Tag
 from .v3 import parse_obj as parse_obj
+from .v3 import schema_validate as schema_validate
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())

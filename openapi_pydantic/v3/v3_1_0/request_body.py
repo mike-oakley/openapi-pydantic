@@ -1,8 +1,58 @@
 from typing import Dict, Optional
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .media_type import MediaType
+
+_examples = [
+    {
+        "description": "user to add to the system",
+        "content": {
+            "application/json": {
+                "schema": {"$ref": "#/components/schemas/User"},
+                "examples": {
+                    "user": {
+                        "summary": "User Example",
+                        "externalValue": "http://foo.bar/examples/user-example.json",
+                    }
+                },
+            },
+            "application/xml": {
+                "schema": {"$ref": "#/components/schemas/User"},
+                "examples": {
+                    "user": {
+                        "summary": "User example in XML",
+                        "externalValue": "http://foo.bar/examples/user-example.xml",
+                    }
+                },
+            },
+            "text/plain": {
+                "examples": {
+                    "user": {
+                        "summary": "User example in Plain text",
+                        "externalValue": "http://foo.bar/examples/user-example.txt",
+                    }
+                }
+            },
+            "*/*": {
+                "examples": {
+                    "user": {
+                        "summary": "User example in other format",
+                        "externalValue": "http://foo.bar/examples/user-example.whatever",
+                    }
+                }
+            },
+        },
+    },
+    {
+        "description": "user to add to the system",
+        "content": {
+            "text/plain": {"schema": {"type": "array", "items": {"type": "string"}}}
+        },
+    },
+]
 
 
 class RequestBody(BaseModel):
@@ -32,56 +82,14 @@ class RequestBody(BaseModel):
     Determines if the request body is required in the request. Defaults to `false`.
     """
 
-    class Config:
-        extra = Extra.allow
-        schema_extra = {
-            "examples": [
-                {
-                    "description": "user to add to the system",
-                    "content": {
-                        "application/json": {
-                            "schema": {"$ref": "#/components/schemas/User"},
-                            "examples": {
-                                "user": {
-                                    "summary": "User Example",
-                                    "externalValue": "http://foo.bar/examples/user-example.json",
-                                }
-                            },
-                        },
-                        "application/xml": {
-                            "schema": {"$ref": "#/components/schemas/User"},
-                            "examples": {
-                                "user": {
-                                    "summary": "User example in XML",
-                                    "externalValue": "http://foo.bar/examples/user-example.xml",
-                                }
-                            },
-                        },
-                        "text/plain": {
-                            "examples": {
-                                "user": {
-                                    "summary": "User example in Plain text",
-                                    "externalValue": "http://foo.bar/examples/user-example.txt",
-                                }
-                            }
-                        },
-                        "*/*": {
-                            "examples": {
-                                "user": {
-                                    "summary": "User example in other format",
-                                    "externalValue": "http://foo.bar/examples/user-example.whatever",
-                                }
-                            }
-                        },
-                    },
-                },
-                {
-                    "description": "user to add to the system",
-                    "content": {
-                        "text/plain": {
-                            "schema": {"type": "array", "items": {"type": "string"}}
-                        }
-                    },
-                },
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            schema_extra = {"examples": _examples}

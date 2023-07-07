@@ -2,11 +2,17 @@ from typing import Dict, Optional
 
 from pydantic import Field
 
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict
 from openapi_pydantic.v3.v3_0_3 import OpenAPI, Operation, PathItem
 
 
 def test_swagger_openapi_v3() -> None:
-    open_api = ExtendedOpenAPI.parse_file("tests/data/swagger_openapi_v3.0.1.json")
+    with open("tests/data/swagger_openapi_v3.0.1.json") as f:
+        if PYDANTIC_V2:
+            validate = getattr(ExtendedOpenAPI, "model_validate_json")
+        else:
+            validate = getattr(ExtendedOpenAPI, "parse_raw")
+        open_api = validate(f.read())
     assert open_api
 
 
@@ -17,8 +23,13 @@ class ExtendedOperation(Operation):
         default=None, alias="x-codegen-request-body-name"
     )
 
-    class Config:
-        allow_population_by_field_name = True
+    if PYDANTIC_V2:
+        model_config = ConfigDict(populate_by_name=True)
+
+    else:
+
+        class Config:
+            allow_population_by_field_name = True
 
 
 class ExtendedPathItem(PathItem):

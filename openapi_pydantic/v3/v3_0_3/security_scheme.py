@@ -1,8 +1,36 @@
 from typing import Optional
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field
+
+from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
 from .oauth_flows import OAuthFlows
+
+_examples = [
+    {"type": "http", "scheme": "basic"},
+    {"type": "apiKey", "name": "api_key", "in": "header"},
+    {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"},
+    {
+        "type": "oauth2",
+        "flows": {
+            "implicit": {
+                "authorizationUrl": "https://example.com/api/oauth/dialog",
+                "scopes": {
+                    "write:pets": "modify pets in your account",
+                    "read:pets": "read your pets",
+                },
+            }
+        },
+    },
+    {
+        "type": "openIdConnect",
+        "openIdConnectUrl": "https://example.com/openIdConnect",
+    },
+    {
+        "type": "openIdConnect",
+        "openIdConnectUrl": "openIdConnect",
+    },  # #5: allow relative path
+]
 
 
 class SecurityScheme(BaseModel):
@@ -69,33 +97,16 @@ class SecurityScheme(BaseModel):
     configuration values. This MUST be in the form of a URL.
     """
 
-    class Config:
-        extra = Extra.allow
-        allow_population_by_field_name = True
-        schema_extra = {
-            "examples": [
-                {"type": "http", "scheme": "basic"},
-                {"type": "apiKey", "name": "api_key", "in": "header"},
-                {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"},
-                {
-                    "type": "oauth2",
-                    "flows": {
-                        "implicit": {
-                            "authorizationUrl": "https://example.com/api/oauth/dialog",
-                            "scopes": {
-                                "write:pets": "modify pets in your account",
-                                "read:pets": "read your pets",
-                            },
-                        }
-                    },
-                },
-                {
-                    "type": "openIdConnect",
-                    "openIdConnectUrl": "https://example.com/openIdConnect",
-                },
-                {
-                    "type": "openIdConnect",
-                    "openIdConnectUrl": "openIdConnect",
-                },  # #5: allow relative path
-            ]
-        }
+    if PYDANTIC_V2:
+        model_config = ConfigDict(
+            extra="allow",
+            populate_by_name=True,
+            json_schema_extra={"examples": _examples},
+        )
+
+    else:
+
+        class Config:
+            extra = Extra.allow
+            allow_population_by_field_name = True
+            schema_extra = {"examples": _examples}
