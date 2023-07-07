@@ -91,7 +91,7 @@ elif PYDANTIC_V2:
     def min_length_arg(min_length: int) -> MinLengthArg:
         return {"min_length": min_length}
 
-    # Create V1 stubs, These should not be used when PYDANTIC_V2 is true.
+    # Create V1 stubs. These should not be used when PYDANTIC_V2 is true.
     Extra = None
     v1_schema = None
 
