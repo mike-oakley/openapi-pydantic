@@ -1,5 +1,16 @@
 import logging
-from typing import TYPE_CHECKING, Any, Generic, List, Optional, Set, Type, TypeVar, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Generic,
+    List,
+    Optional,
+    Set,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from pydantic import BaseModel
 
@@ -143,7 +154,7 @@ def construct_open_api_with_schema_class(
 
 def _validate_schemas(
     schema_definitions: dict[str, Any]
-) -> dict[str, Reference | Schema]:
+) -> dict[str, Union[Reference, Schema]]:
     """Convert JSON Schema definitions to parsed OpenAPI objects"""
     # Note: if an error occurs in schema_validate(), it may indicate that
     # the generated JSON schemas are not compatible with the version

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pytest
 
 from openapi_pydantic import (
@@ -69,7 +71,7 @@ def construct_sample_api() -> OpenAPI:
 
     class SampleModel(BaseModel):
         req: bool
-        opt: bool | None = None
+        opt: Optional[bool] = None
 
         @computed_field  # type: ignore
         @property
