@@ -602,9 +602,9 @@ if TYPE_CHECKING:
     def schema_validate(
         obj: Any,
         *,
-        strict: bool | None = None,
-        from_attributes: bool | None = None,
-        context: dict[str, Any] | None = None
+        strict: Optional[bool] = None,
+        from_attributes: Optional[bool] = None,
+        context: Optional[dict[str, Any]] = None
     ) -> Schema:
         ...
 
