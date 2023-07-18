@@ -2,6 +2,7 @@ import logging
 from typing import (
     TYPE_CHECKING,
     Any,
+    Dict,
     Generic,
     List,
     Optional,
@@ -153,8 +154,8 @@ def construct_open_api_with_schema_class(
 
 
 def _validate_schemas(
-    schema_definitions: dict[str, Any]
-) -> dict[str, Union[Reference, Schema]]:
+    schema_definitions: Dict[str, Any]
+) -> Dict[str, Union[Reference, Schema]]:
     """Convert JSON Schema definitions to parsed OpenAPI objects"""
     # Note: if an error occurs in schema_validate(), it may indicate that
     # the generated JSON schemas are not compatible with the version
