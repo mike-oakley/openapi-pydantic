@@ -961,7 +961,7 @@ if TYPE_CHECKING:
         *,
         strict: Optional[bool] = None,
         from_attributes: Optional[bool] = None,
-        context: Optional[dict[str, Any]] = None
+        context: Optional[Dict[str, Any]] = None
     ) -> Schema:
         ...
 
