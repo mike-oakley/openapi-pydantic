@@ -75,35 +75,11 @@ class ParameterLocation(str, enum.Enum):
     COOKIE = "cookie"
 
 
-class Parameter(BaseModel):
+class ParameterBase(BaseModel):
     """
-    Describes a single operation parameter.
+    Base class for Parameter and Header.
 
-    A unique parameter is defined by a combination of a [name](#parameterName) and
-    [location](#parameterIn).
-    """
-
-    """Fixed Fields"""
-
-    name: str
-    """
-    **REQUIRED**. The name of the parameter.
-    Parameter names are *case sensitive*. 
-    
-    - If [`in`](#parameterIn) is `"path"`, the `name` field MUST correspond to a 
-      template expression occurring within the [path](#pathsPath) field in the 
-      [Paths Object](#pathsObject). See [Path Templating](#pathTemplating) for further 
-      information.
-    - If [`in`](#parameterIn) is `"header"` and the `name` field is `"Accept"`, 
-      `"Content-Type"` or `"Authorization"`, the parameter definition SHALL be ignored.
-    - For all other cases, the `name` corresponds to the parameter name used by the 
-      [`in`](#parameterIn) property.
-    """
-
-    param_in: ParameterLocation = Field(alias="in")
-    """
-    **REQUIRED**. The location of the parameter. Possible values are `"query"`, 
-    `"header"`, `"path"` or `"cookie"`.
+    (Header is like Parameter, but has no `name` or `in` fields.)
     """
 
     description: Optional[str] = None
@@ -128,7 +104,7 @@ class Parameter(BaseModel):
     Default value is `false`.
     """
 
-    allowEmptyValue: bool = False
+    allowEmptyValue: Optional[bool] = None
     """
     Sets the ability to pass empty-valued parameters.
     This is valid only for `query` parameters and allows sending a parameter with an 
@@ -165,7 +141,7 @@ class Parameter(BaseModel):
     For all other styles, the default value is `false`.
     """
 
-    allowReserved: bool = False
+    allowReserved: Optional[bool] = None
     """
     Determines whether the parameter value SHOULD allow reserved characters,
     as defined by [RFC3986](https://tools.ietf.org/html/rfc3986#section-2.2)
@@ -230,3 +206,35 @@ class Parameter(BaseModel):
             extra = Extra.allow
             allow_population_by_field_name = True
             schema_extra = {"examples": _examples}
+
+
+class Parameter(ParameterBase):
+    """
+    Describes a single operation parameter.
+
+    A unique parameter is defined by a combination of a [name](#parameterName) and
+    [location](#parameterIn).
+    """
+
+    """Fixed Fields"""
+
+    name: str
+    """
+    **REQUIRED**. The name of the parameter.
+    Parameter names are *case sensitive*.
+
+    - If [`in`](#parameterIn) is `"path"`, the `name` field MUST correspond to a
+      template expression occurring within the [path](#pathsPath) field in the
+      [Paths Object](#pathsObject). See [Path Templating](#pathTemplating) for further
+      information.
+    - If [`in`](#parameterIn) is `"header"` and the `name` field is `"Accept"`,
+      `"Content-Type"` or `"Authorization"`, the parameter definition SHALL be ignored.
+    - For all other cases, the `name` corresponds to the parameter name used by the
+      [`in`](#parameterIn) property.
+    """
+
+    param_in: ParameterLocation = Field(alias="in")
+    """
+    **REQUIRED**. The location of the parameter. Possible values are `"query"`,
+    `"header"`, `"path"` or `"cookie"`.
+    """

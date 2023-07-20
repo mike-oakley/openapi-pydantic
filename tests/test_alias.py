@@ -1,10 +1,8 @@
 from typing import Callable
 
 from openapi_pydantic import (
-    Header,
     MediaType,
     Parameter,
-    ParameterLocation,
     PathItem,
     Reference,
     Schema,
@@ -13,15 +11,6 @@ from openapi_pydantic import (
 from openapi_pydantic.compat import PYDANTIC_V2
 
 validate_func_name = "model_validate" if PYDANTIC_V2 else "parse_obj"
-
-
-def test_header_alias() -> None:
-    header_1 = Header(param_in="header")
-    model_validate: Callable[[dict], Header] = getattr(Header, validate_func_name)
-    header_2 = model_validate({"param_in": "header"})
-    header_3 = model_validate({"in": "header"})
-    header_4 = model_validate({"in": ParameterLocation.HEADER})
-    assert header_1 == header_2 == header_3 == header_4
 
 
 def test_media_type_alias() -> None:
