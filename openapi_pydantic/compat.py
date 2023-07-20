@@ -1,6 +1,6 @@
 """Compatibility layer to make this package usable with Pydantic 1 or 2"""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
     def ConfigDict(
         extra: Literal["allow", "ignore", "forbid"] = "allow",
-        json_schema_extra: Optional[dict[str, Any]] = None,
+        json_schema_extra: Optional[Dict[str, Any]] = None,
         populate_by_name: bool = True,
     ) -> PydanticConfigDict:
         """Stub for pydantic.ConfigDict in Pydantic 2"""
@@ -49,21 +49,21 @@ if TYPE_CHECKING:
     JsonSchemaMode = Literal["validation", "serialization"]
 
     def models_json_schema(
-        models: list[tuple[Type[BaseModel], JsonSchemaMode]],
+        models: List[Tuple[Type[BaseModel], JsonSchemaMode]],
         *,
         by_alias: bool = True,
         ref_template: str = "#/$defs/{model}",
         schema_generator: Optional[type] = None,
-    ) -> tuple[dict, dict[str, Any]]:
+    ) -> Tuple[Dict, Dict[str, Any]]:
         """Stub for pydantic.json_schema.models_json_schema in Pydantic 2"""
         ...
 
     def v1_schema(
-        models: list[Type[BaseModel]],
+        models: List[Type[BaseModel]],
         *,
         by_alias: bool = True,
         ref_prefix: str = "#/$defs",
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         """Stub for pydantic.schema.schema in Pydantic 1"""
         ...
 
