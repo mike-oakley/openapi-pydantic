@@ -62,23 +62,52 @@ if TYPE_CHECKING:
         ...
 
 elif PYDANTIC_V2:
+    from enum import Enum
+
     from pydantic.json_schema import GenerateJsonSchema, JsonSchemaValue
     from pydantic_core import core_schema
 
     class GenerateOpenAPI30Schema(GenerateJsonSchema):
-        """Modify the schema generation for OpenAPI 3.0.
-
-        In OpenAPI 3.0, types can not be None, but a special "nullable"
-        field is available.
-        """
+        """Modify the schema generation for OpenAPI 3.0."""
 
         def nullable_schema(
             self,
             schema: core_schema.NullableSchema,
         ) -> JsonSchemaValue:
+            """Generates a JSON schema that matches a schema that allows null values.
+
+            In OpenAPI 3.0, types can not be None, but a special "nullable" field is
+            available.
+            """
             inner_json_schema = self.generate_inner(schema["schema"])
             inner_json_schema["nullable"] = True
             return inner_json_schema
+
+        def literal_schema(self, schema: core_schema.LiteralSchema) -> JsonSchemaValue:
+            """Generates a JSON schema that matches a literal value.
+
+            In OpenAPI 3.0, the "const" keyword is not supported, so this
+            version of this method skips that optimization.
+            """
+            expected = [
+                v.value if isinstance(v, Enum) else v for v in schema["expected"]
+            ]
+
+            types = {type(e) for e in expected}
+            if types == {str}:
+                return {"enum": expected, "type": "string"}
+            elif types == {int}:
+                return {"enum": expected, "type": "integer"}
+            elif types == {float}:
+                return {"enum": expected, "type": "number"}
+            elif types == {bool}:
+                return {"enum": expected, "type": "boolean"}
+            elif types == {list}:
+                return {"enum": expected, "type": "array"}
+            # there is not None case because if it's mixed it hits the final `else`
+            # if it's a single Literal[None] then it becomes a `const` schema above
+            else:
+                return {"enum": expected}
 
 else:
 
