@@ -48,12 +48,13 @@ def test_optional_and_computed_fields() -> None:
 
     # When serializing:
     # - required fields are still required
-    # - optional fields become required
+    # - optional fields are still optional
+    #   (except when json_schema_serialization_defaults_required is enabled)
     # - computed fields are required
     assert "req" in resp_schema.properties
     assert "opt" in resp_schema.properties
     assert "comp" in resp_schema.properties
-    assert set(resp_schema.required) == {"req", "comp", "opt"}
+    assert set(resp_schema.required) == {"req", "comp"}
 
 
 def construct_sample_api() -> OpenAPI:
