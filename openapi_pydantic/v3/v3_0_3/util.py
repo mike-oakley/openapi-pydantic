@@ -142,9 +142,7 @@ def construct_open_api_with_schema_class(
     if scan_for_pydantic_schema_reference:
         extracted_schema_classes = _handle_pydantic_schema(new_open_api)
         if schema_classes:
-            schema_classes = list(
-                {*schema_classes, *_handle_pydantic_schema(new_open_api)}
-            )
+            schema_classes = list({*schema_classes, *extracted_schema_classes})
         else:
             schema_classes = extracted_schema_classes
 
