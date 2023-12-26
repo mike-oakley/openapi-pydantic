@@ -104,23 +104,6 @@ class ParameterBase(BaseModel):
     Default value is `false`.
     """
 
-    allowEmptyValue: Optional[bool] = None
-    """
-    Sets the ability to pass empty-valued parameters.
-    This is valid only for `query` parameters and allows sending a parameter with an 
-    empty value. Default value is `false`.
-    If [`style`](#parameterStyle) is used, and if behavior is `n/a` (cannot be 
-    serialized), the value of `allowEmptyValue` SHALL be ignored.
-    Use of this property is NOT RECOMMENDED, as it is likely to be removed in a later 
-    revision.
-    """
-
-    """
-    The rules for serialization of the parameter are specified in one of two ways.
-    For simpler scenarios, a [`schema`](#parameterSchema) and [`style`](#parameterStyle)
-    can describe the structure and syntax of the parameter.
-    """
-
     style: Optional[str] = None
     """
     Describes how the parameter value will be serialized depending on the type of the 
@@ -139,15 +122,6 @@ class ParameterBase(BaseModel):
     For other types of parameters this property has no effect.
     When [`style`](#parameterStyle) is `form`, the default value is `true`.
     For all other styles, the default value is `false`.
-    """
-
-    allowReserved: Optional[bool] = None
-    """
-    Determines whether the parameter value SHOULD allow reserved characters,
-    as defined by [RFC3986](https://tools.ietf.org/html/rfc3986#section-2.2)
-    `:/?#[]@!$&'()*+,;=` to be included without percent-encoding.
-    This property only applies to parameters with an `in` value of `query`.
-    The default value is `false`.
     """
 
     param_schema: Optional[Union[Reference, Schema]] = Field(
@@ -237,4 +211,24 @@ class Parameter(ParameterBase):
     """
     **REQUIRED**. The location of the parameter. Possible values are `"query"`,
     `"header"`, `"path"` or `"cookie"`.
+    """
+
+    allowEmptyValue: bool = False
+    """
+    Sets the ability to pass empty-valued parameters.
+    This is valid only for `query` parameters and allows sending a parameter with an 
+    empty value. Default value is `false`.
+    If [`style`](#parameterStyle) is used, and if behavior is `n/a` (cannot be 
+    serialized), the value of `allowEmptyValue` SHALL be ignored.
+    Use of this property is NOT RECOMMENDED, as it is likely to be removed in a later 
+    revision.
+    """
+
+    allowReserved: bool = False
+    """
+    Determines whether the parameter value SHOULD allow reserved characters,
+    as defined by [RFC3986](https://tools.ietf.org/html/rfc3986#section-2.2)
+    `:/?#[]@!$&'()*+,;=` to be included without percent-encoding.
+    This property only applies to parameters with an `in` value of `query`.
+    The default value is `false`.
     """
