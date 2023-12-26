@@ -1,8 +1,10 @@
+# mypy: ignore-errors
+
 from typing import Optional
 
 import pytest
 
-from openapi_pydantic.compat import PYDANTIC_V2, JsonSchemaMode
+from openapi_pydantic.compat import PYDANTIC_V2
 from openapi_pydantic.v3.v3_0_3 import (
     Info,
     MediaType,
@@ -60,7 +62,7 @@ def test_optional_and_computed_fields() -> None:
 def construct_sample_api() -> OpenAPI:
     from typing import TYPE_CHECKING, Callable
 
-    from pydantic import BaseModel, ConfigDict
+    from pydantic import BaseModel
 
     if TYPE_CHECKING:
 
@@ -69,9 +71,6 @@ def construct_sample_api() -> OpenAPI:
 
     else:
         from pydantic import computed_field
-
-    class ConfigDictExt(ConfigDict, total=False):
-        json_schema_mode: JsonSchemaMode
 
     class SampleModel(BaseModel):
         req: bool
@@ -83,10 +82,10 @@ def construct_sample_api() -> OpenAPI:
             return True
 
     class SampleRequest(SampleModel):
-        model_config = ConfigDictExt(json_schema_mode="validation")
+        model_config = {"json_schema_mode": "validation"}
 
     class SampleResponse(SampleModel):
-        model_config = ConfigDictExt(json_schema_mode="serialization")
+        model_config = {"json_schema_mode": "serialization"}
 
     return OpenAPI(
         info=Info(
