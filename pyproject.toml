@@ -28,6 +28,7 @@ pydantic = ">=1.8"
 [tool.poetry.group.test.dependencies]
 pytest = "^7.3.0"
 pytest-cov = "^4.0.0"
+openapi-spec-validator = "^0.7.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

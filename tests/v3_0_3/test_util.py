@@ -1,5 +1,5 @@
 import logging
-from typing import Callable
+from typing import Callable, Literal
 
 from pydantic import BaseModel, Field
 
@@ -179,6 +179,42 @@ def construct_base_open_api_3() -> OpenAPI:
     )
 
 
+def construct_base_open_api_3_plus() -> OpenAPI:
+    return OpenAPI(
+        info=Info(
+            title="My own API",
+            version="v0.0.1",
+        ),
+        paths={
+            "/ping": PathItem(
+                post=Operation(
+                    requestBody=RequestBody(
+                        content={
+                            "application/json": MediaType(
+                                media_type_schema=PydanticSchema(
+                                    schema_class=PingPlusRequest
+                                )
+                            )
+                        }
+                    ),
+                    responses={
+                        "200": Response(
+                            description="pong",
+                            content={
+                                "application/json": MediaType(
+                                    media_type_schema=PydanticSchema(
+                                        schema_class=PongResponse
+                                    )
+                                )
+                            },
+                        )
+                    },
+                )
+            )
+        },
+    )
+
+
 class PingRequest(BaseModel):
     """Ping Request"""
 
@@ -198,3 +234,23 @@ class PongResponse(BaseModel):
 
     resp_foo: str = Field(alias="pong_foo", description="foo value of the response")
     resp_bar: str = Field(alias="pong_bar", description="bar value of the response")
+
+
+class PingPlusRequest(BaseModel):
+    """Ping Request with extra"""
+
+    req_foo: str
+    req_bar: str
+    req_single_choice: Literal["one"]
+
+
+def test_enum_with_single_choice() -> None:
+    api_obj = construct_open_api_with_schema_class(construct_base_open_api_3_plus())
+    model_dump = getattr(api_obj, "model_dump" if PYDANTIC_V2 else "dict")
+    api = model_dump(by_alias=True, exclude_none=True)
+    schema = api["components"]["schemas"]["PingPlusRequest"]
+    prop = schema["properties"]["req_single_choice"]
+    # OpenAPI 3.0 does not support "const", so make sure the enum is not
+    # rendered that way.
+    assert not prop.get("const")
+    assert prop["enum"] == ["one"]

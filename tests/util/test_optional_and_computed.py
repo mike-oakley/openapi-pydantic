@@ -1,3 +1,5 @@
+# mypy: ignore-errors
+
 from typing import Optional
 
 import pytest
@@ -12,7 +14,7 @@ from openapi_pydantic import (
     Response,
     Schema,
 )
-from openapi_pydantic.compat import PYDANTIC_V2, JsonSchemaMode
+from openapi_pydantic.compat import PYDANTIC_V2
 from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
 
 
@@ -45,18 +47,19 @@ def test_optional_and_computed_fields() -> None:
 
     # When serializing:
     # - required fields are still required
-    # - optional fields become required
+    # - optional fields are still optional
+    #   (except when json_schema_serialization_defaults_required is enabled)
     # - computed fields are required
     assert "req" in resp_schema.properties
     assert "opt" in resp_schema.properties
     assert "comp" in resp_schema.properties
-    assert set(resp_schema.required) == {"req", "comp", "opt"}
+    assert set(resp_schema.required) == {"req", "comp"}
 
 
 def construct_sample_api() -> OpenAPI:
     from typing import TYPE_CHECKING, Callable
 
-    from pydantic import BaseModel, ConfigDict
+    from pydantic import BaseModel
 
     if TYPE_CHECKING:
 
@@ -66,23 +69,20 @@ def construct_sample_api() -> OpenAPI:
     else:
         from pydantic import computed_field
 
-    class ConfigDictExt(ConfigDict, total=False):
-        json_schema_mode: JsonSchemaMode
-
     class SampleModel(BaseModel):
         req: bool
         opt: Optional[bool] = None
 
-        @computed_field  # type: ignore
+        @computed_field
         @property
         def comp(self) -> bool:
             return True
 
     class SampleRequest(SampleModel):
-        model_config = ConfigDictExt(json_schema_mode="validation")
+        model_config = {"json_schema_mode": "validation"}
 
     class SampleResponse(SampleModel):
-        model_config = ConfigDictExt(json_schema_mode="serialization")
+        model_config = {"json_schema_mode": "serialization"}
 
     return OpenAPI(
         info=Info(
