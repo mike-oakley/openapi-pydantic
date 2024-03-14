@@ -15,6 +15,8 @@ __all__ = [
     "v1_schema",
     "DEFS_KEY",
     "min_length_arg",
+    "get_flat_models_from_models",
+    "get_model_name_map"
 ]
 
 PYDANTIC_MAJOR_VERSION = int(PYDANTIC_VERSION.split(".", 1)[0])
@@ -100,12 +102,14 @@ elif PYDANTIC_V2:
     # Create V1 stubs. These should not be used when PYDANTIC_V2 is true.
     Extra = None
     v1_schema = None
+    get_flat_models_from_models = None
+    get_model_name_map = None
 
 
 else:
 
     from pydantic import Extra
-    from pydantic.schema import schema as v1_schema
+    from pydantic.schema import schema as v1_schema, get_flat_models_from_models, get_model_name_map
 
     # Pydantic 1 renders JSON schemas using the keyword "definitions"
     DEFS_KEY = "definitions"

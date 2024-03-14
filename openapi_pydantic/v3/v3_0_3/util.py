@@ -21,6 +21,8 @@ from openapi_pydantic.compat import (
     JsonSchemaMode,
     models_json_schema,
     v1_schema,
+    get_flat_models_from_models,
+    get_model_name_map
 )
 
 from . import Components, OpenAPI, Reference, Schema, schema_validate
@@ -139,8 +141,10 @@ def construct_open_api_with_schema_class(
     copy_func = getattr(open_api, "model_copy" if PYDANTIC_V2 else "copy")
     new_open_api: OpenAPI = copy_func(deep=True)
 
+    model_name_map = _get_schemas_unique_names(new_open_api)
+
     if scan_for_pydantic_schema_reference:
-        extracted_schema_classes = _handle_pydantic_schema(new_open_api)
+        extracted_schema_classes = _handle_pydantic_schema(new_open_api, model_name_map)
         if schema_classes:
             schema_classes = list({*schema_classes, *extracted_schema_classes})
         else:
@@ -193,7 +197,7 @@ def _validate_schemas(
     }
 
 
-def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
+def _handle_pydantic_schema(open_api: OpenAPI, model_name_map: Dict[Type[BaseModel], str]) -> List[Type[BaseModel]]:
     """
     This function traverses the `OpenAPI` object and
 
@@ -204,6 +208,7 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
     **This function will mutate the input `OpenAPI` object.**
 
     :param open_api: the `OpenAPI` object to be traversed and mutated
+    :model_name_map: a dict of schema classes as a key and unique name as a value
     :return: a list of schema classes extracted from `PydanticSchema` objects
     """
 
@@ -218,7 +223,7 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
                 child_obj = obj.__getattribute__(field)
                 if isinstance(child_obj, PydanticSchema):
                     logger.debug("PydanticSchema found in %s: %s", obj, child_obj)
-                    obj.__setattr__(field, _construct_ref_obj(child_obj))
+                    obj.__setattr__(field, _construct_ref_obj(child_obj, model_name_map))
                     pydantic_types.add(child_obj.schema_class)
                 else:
                     _traverse(child_obj)
@@ -243,7 +248,61 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
     return list(pydantic_types)
 
 
-def _construct_ref_obj(pydantic_schema: PydanticSchema[PydanticType]) -> Reference:
-    ref_obj = Reference(**{"$ref": ref_prefix + pydantic_schema.schema_class.__name__})
+def _construct_ref_obj(pydantic_schema: PydanticSchema[PydanticType], model_name_map: Dict[Type[BaseModel], str]) -> Reference:
+    unique_model_name = model_name_map.get(pydantic_schema.schema_class)
+    if unique_model_name is None:
+        unique_model_name = pydantic_schema.schema_class.__name__
+    ref_obj = Reference(**{"$ref": ref_prefix + unique_model_name})
     logger.debug(f"ref_obj={ref_obj}")
     return ref_obj
+
+
+def _get_schemas_unique_names(open_api: OpenAPI) -> Dict[Type[BaseModel], str]:
+    """
+    This function traverses the `OpenAPI` object and
+
+    1. Finds the `PydanticSchema`
+    2. Extracts the involved schema class from `PydanticSchema` object.
+    3. Generates unique schema names.
+
+    :param open_api: the `OpenAPI` object to be traversed
+    :return: a dict of schema classes extracted from `PydanticSchema`
+        objects as key and unique name as a value
+    """
+
+    pydantic_types: Set[Type[BaseModel]] = set()
+
+    def _traverse(obj: Any) -> None:
+        if isinstance(obj, BaseModel):
+            fields = getattr(
+                obj, "model_fields_set" if PYDANTIC_V2 else "__fields_set__"
+            )
+            for field in fields:
+                child_obj = obj.__getattribute__(field)
+                if isinstance(child_obj, PydanticSchema):
+                    logger.debug("PydanticSchema found in %s: %s", obj, child_obj)
+                    pydantic_types.add(child_obj.schema_class)
+                else:
+                    _traverse(child_obj)
+        elif isinstance(obj, list):
+            for index, elem in enumerate(obj):
+                if isinstance(elem, PydanticSchema):
+                    logger.debug(f"PydanticSchema found in list: {elem}")
+                    pydantic_types.add(elem.schema_class)
+                else:
+                    _traverse(elem)
+        elif isinstance(obj, dict):
+            for key, value in obj.items():
+                if isinstance(value, PydanticSchema):
+                    logger.debug(f"PydanticSchema found in dict: {value}")
+                    pydantic_types.add(value.schema_class)
+                else:
+                    _traverse(value)
+
+    _traverse(open_api)
+    if PYDANTIC_V2:
+        model_name_map = {}
+    else:
+        flat_models = get_flat_models_from_models(pydantic_types)
+        model_name_map = get_model_name_map(flat_models)
+    return model_name_map
