@@ -1,5 +1,6 @@
 """Compatibility layer to make this package usable with Pydantic 1 or 2"""
 
+import sys
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 from pydantic.version import VERSION as PYDANTIC_VERSION
@@ -19,11 +20,17 @@ __all__ = [
 PYDANTIC_MAJOR_VERSION = int(PYDANTIC_VERSION.split(".", 1)[0])
 PYDANTIC_V2 = PYDANTIC_MAJOR_VERSION >= 2
 
+if sys.version_info.minor >= 8:
+    from typing import TypedDict, Literal
+else:
+    # Provide python <= 3.7 compatibility
+    from typing_extensions import TypedDict, Literal
+
 if TYPE_CHECKING:
     # Provide stubs for either version of Pydantic
 
     from enum import Enum
-    from typing import Any, Literal, Type, TypedDict
+    from typing import Any, Type
 
     from pydantic import BaseModel
     from pydantic import ConfigDict as PydanticConfigDict
@@ -77,7 +84,6 @@ if TYPE_CHECKING:
         ...
 
 elif PYDANTIC_V2:
-    from typing import TypedDict
 
     from pydantic import ConfigDict, RootModel
     from pydantic.json_schema import JsonSchemaMode, models_json_schema
@@ -97,7 +103,6 @@ elif PYDANTIC_V2:
 
 
 else:
-    from typing import TypedDict
 
     from pydantic import Extra
     from pydantic.schema import schema as v1_schema
