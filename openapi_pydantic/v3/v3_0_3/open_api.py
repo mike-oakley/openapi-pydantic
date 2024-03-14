@@ -1,4 +1,11 @@
-from typing import List, Literal, Optional
+import sys
+if sys.version_info.minor >= 8:
+    # Provide python <= 3.7 compatibility
+    from typing import Literal
+else:
+    from typing_extensions import Literal
+
+from typing import List, Optional
 
 from pydantic import BaseModel
 

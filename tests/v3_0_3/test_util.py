@@ -1,5 +1,13 @@
 import logging
-from typing import Callable, Literal
+import sys
+
+if sys.version_info.minor >= 8:
+    # Provide python <= 3.7 compatibility
+    from typing import Literal
+else:
+    from typing_extensions import Literal
+
+from typing import Callable
 
 from pydantic import BaseModel, Field
 

@@ -1,4 +1,10 @@
-from typing import Literal
+import sys
+if sys.version_info.minor >= 8:
+    from typing import Literal
+else:
+    # Provide python <= 3.7 compatibility
+    from typing_extensions import Literal
+
 
 import pytest
 
