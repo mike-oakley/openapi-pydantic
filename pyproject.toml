@@ -31,7 +31,7 @@ pytest-cov = "^4.0.0"
 openapi-spec-validator = "^0.7.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.12.1"
+black = ">=23.12.1,<25.0.0"
 mypy = "^1.8.0"
 pre-commit = "^2.16.0"
 ruff = "^0.1.9"
