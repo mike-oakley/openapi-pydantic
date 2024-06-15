@@ -21,6 +21,9 @@ classifiers = [
 ]
 include = ["openapi_pydantic/py.typed"]
 
+[tool.poetry.urls]
+changelog = "https://github.com/mike-oakley/openapi-pydantic/releases"
+
 [tool.poetry.dependencies]
 python = "^3.8"
 pydantic = ">=1.8"
