@@ -962,8 +962,7 @@ if TYPE_CHECKING:
         strict: Optional[bool] = None,
         from_attributes: Optional[bool] = None,
         context: Optional[Dict[str, Any]] = None
-    ) -> Schema:
-        ...
+    ) -> Schema: ...
 
 elif PYDANTIC_V2:
     schema_validate = Schema.model_validate

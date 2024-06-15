@@ -63,8 +63,7 @@ def construct_sample_api() -> OpenAPI:
 
     if TYPE_CHECKING:
 
-        def computed_field(x: Callable) -> Callable:
-            ...
+        def computed_field(x: Callable) -> Callable: ...
 
     else:
         from pydantic import computed_field
