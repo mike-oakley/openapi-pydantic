@@ -58,8 +58,7 @@ def get_mode(
 
 if TYPE_CHECKING:
 
-    class GenerateOpenAPI30Schema:
-        ...
+    class GenerateOpenAPI30Schema: ...
 
 elif PYDANTIC_V2:
     from enum import Enum
@@ -111,8 +110,7 @@ elif PYDANTIC_V2:
 
 else:
 
-    class GenerateOpenAPI30Schema:
-        ...
+    class GenerateOpenAPI30Schema: ...
 
 
 def construct_open_api_with_schema_class(
