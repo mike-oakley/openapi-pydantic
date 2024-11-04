@@ -2,8 +2,6 @@ name: Publish
 
 on:
   workflow_dispatch:
-    branches:
-      - main
   release:
     types:
       - published
@@ -23,11 +21,11 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           virtualenvs-create: false
-          version: 1.7.1
+          version: 1.8.3
       - name: Build package distribution
         run: poetry build
       - name: Upload package artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: distribution
           path: dist
@@ -43,7 +41,7 @@ jobs:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
     - name: Download package distribution
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: distribution
         path: dist
@@ -63,7 +61,7 @@ jobs:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
     - name: Download package distribution
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: distribution
         path: dist
