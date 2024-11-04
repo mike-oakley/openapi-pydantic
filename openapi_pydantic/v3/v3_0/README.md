@@ -1,4 +1,4 @@
-# OpenAPI v3.1.0 schema classes
+# OpenAPI v3.0 schema classes
 
 ## Alias
 
@@ -16,8 +16,6 @@ the following fields are used with [alias](https://pydantic-docs.helpmanual.io/u
 | SecurityScheme | security_scheme_in | in |
 | Schema | schema_format | format |
 | Schema | schema_not | not |
-| Schema | schema_if | if |
-| Schema | schema_else | else |
 
 > <a name="header_param_in"></a>The "in" field in Header object is actually a constant (`{"in": "header"}`).
 

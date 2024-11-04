@@ -7,7 +7,7 @@ from openapi_spec_validator import validate
 from pydantic import BaseModel
 
 from openapi_pydantic.compat import PYDANTIC_V2
-from openapi_pydantic.v3.v3_0_3 import (
+from openapi_pydantic.v3.v3_0 import (
     Components,
     DataType,
     Example,
@@ -21,7 +21,7 @@ from openapi_pydantic.v3.v3_0_3 import (
     Response,
     Schema,
 )
-from openapi_pydantic.v3.v3_0_3.util import (
+from openapi_pydantic.v3.v3_0.util import (
     PydanticSchema,
     construct_open_api_with_schema_class,
 )

@@ -1,9 +1,9 @@
 """
-OpenAPI v3.0.3 schema types, created according to the specification:
-https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md
+OpenAPI v3.1 schema types, created according to the specification:
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.1.md
 
 The type orders are according to the contents of the specification:
-https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md#table-of-contents
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.1.md#table-of-contents
 """
 
 from typing import TYPE_CHECKING

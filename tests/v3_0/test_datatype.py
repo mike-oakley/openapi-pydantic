@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from openapi_pydantic.v3.v3_0_3 import Schema
+from openapi_pydantic.v3.v3_0 import Schema
 
 
 @pytest.mark.parametrize(

@@ -4,7 +4,7 @@ from typing import Callable, Literal
 from pydantic import BaseModel, Field
 
 from openapi_pydantic.compat import PYDANTIC_V2
-from openapi_pydantic.v3.v3_0_3 import (
+from openapi_pydantic.v3.v3_0 import (
     Info,
     MediaType,
     OpenAPI,
@@ -15,7 +15,7 @@ from openapi_pydantic.v3.v3_0_3 import (
     Response,
     Schema,
 )
-from openapi_pydantic.v3.v3_0_3.util import (
+from openapi_pydantic.v3.v3_0.util import (
     PydanticSchema,
     construct_open_api_with_schema_class,
 )
