@@ -115,7 +115,7 @@ class ParameterBase(BaseModel):
     - for `cookie` - `form`.
     """
 
-    explode: bool = False
+    explode: Optional[bool] = None
     """
     When this is true, parameter values of type `array` or `object` generate separate 
     parameters for each value of the array or key-value pair of the map.
