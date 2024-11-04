@@ -59,7 +59,7 @@ class Encoding(BaseModel):
     the request body media type is not `application/x-www-form-urlencoded`.
     """
 
-    explode: bool = False
+    explode: Optional[bool] = None
     """
     When this is true, property values of type `array` or `object` generate separate 
     parameters for each value of the array, or key-value-pair of the map.
