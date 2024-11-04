@@ -6,7 +6,7 @@
 OpenAPI schema implemented in [Pydantic](https://github.com/samuelcolvin/pydantic). Both Pydantic 1.8+ and 2.x are supported.
 
 The naming of the classes follows the schema in 
-[OpenAPI specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md#schema).
+[OpenAPI specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.1.md#schema).
 
 > This library is forked from [OpenAPI Schema Pydantic](https://github.com/kuimono/openapi-schema-pydantic)  (at version [1.2.4](https://github.com/kuimono/openapi-schema-pydantic/releases/tag/v1.2.4)) which is no longer actively maintained.
 
@@ -45,7 +45,7 @@ Result:
 
 ```json
 {
-  "openapi": "3.1.0",
+  "openapi": "3.1.1",
   "info": {
     "title": "My own API",
     "version": "v0.0.1"
@@ -81,7 +81,7 @@ from openapi_pydantic import parse_obj, OpenAPI, PathItem, Response
 
 # Construct OpenAPI from dict, inferring the correct schema version
 open_api = parse_obj({
-    "openapi": "3.1.0",
+    "openapi": "3.1.1",
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {
         "/ping": {
@@ -91,7 +91,7 @@ open_api = parse_obj({
 })
 
 
-# Construct OpenAPI v3.1.0 schema from dict
+# Construct OpenAPI v3.1 schema from dict
 # Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
 open_api = OpenAPI.model_validate({
     "info": {"title": "My own API", "version": "v0.0.1"},
@@ -116,7 +116,7 @@ open_api = OpenAPI.model_validate({
 
 ## Use Pydantic classes as schema
 
-- The [Schema Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md#schemaObject)
+- The [Schema Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.4.md#schemaObject)
   in OpenAPI has definitions and tweaks in JSON Schema, which are hard to comprehend and define a good data class
 - Pydantic already has a good way to [create JSON schema](https://pydantic-docs.helpmanual.io/usage/schema/).
   Let's not reinvent the wheel.
@@ -175,7 +175,7 @@ Result:
 
 ```json
 {
-  "openapi": "3.1.0",
+  "openapi": "3.1.1",
   "info": {
     "title": "My own API",
     "version": "v0.0.1"
@@ -286,8 +286,8 @@ More info about field aliases:
 
 | OpenAPI version | Field alias info |
 | --------------- | ---------------- |
-| 3.1.0 | [here](https://github.com/mike-oakley/openapi-pydantic/blob/main/openapi_pydantic/v3/v3_1_0/README.md#alias) |
-| 3.0.3 | [here](https://github.com/mike-oakley/openapi-pydantic/blob/main/openapi_pydantic/v3/v3_0_3/README.md#alias) |
+| 3.1 | [here](https://github.com/mike-oakley/openapi-pydantic/blob/main/openapi_pydantic/v3/v3_1/README.md#alias) |
+| 3.0 | [here](https://github.com/mike-oakley/openapi-pydantic/blob/main/openapi_pydantic/v3/v3_0/README.md#alias) |
 
 ### Non-pydantic schema types
 
@@ -296,17 +296,17 @@ Please refer to the following for more info:
 
 | OpenAPI version | Non-pydantic schema type info |
 | --------------- | ----------------------------- |
-| 3.1.0 | [here](https://github.com/mike-oakley/openapi-pydantic/blob/main/openapi_pydantic/v3/v3_1_0/README.md#non-pydantic-schema-types) |
-| 3.0.3 | [here](https://github.com/mike-oakley/openapi-pydantic/blob/main/openapi_pydantic/v3/v3_0_3/README.md#non-pydantic-schema-types) |
+| 3.1 | [here](https://github.com/mike-oakley/openapi-pydantic/blob/main/openapi_pydantic/v3/v3_1/README.md#non-pydantic-schema-types) |
+| 3.0 | [here](https://github.com/mike-oakley/openapi-pydantic/blob/main/openapi_pydantic/v3/v3_0/README.md#non-pydantic-schema-types) |
 
-### Use OpenAPI 3.0.3 instead of 3.1.0
+### Use OpenAPI 3.0 instead of 3.1
 
-Some UI renderings (e.g. Swagger) still do not support OpenAPI 3.1.0.
-The old 3.0.3 version is available by importing from different paths:
+Some UI renderings (e.g. Swagger) still do not support OpenAPI 3.1.x.
+The old 3.0.x version is available by importing from different paths:
 
 ```python
-from openapi_pydantic.v3.v3_0_3 import OpenAPI, ...
-from openapi_pydantic.v3.v3_0_3.util import PydanticSchema, construct_open_api_with_schema_class
+from openapi_pydantic.v3.v3_0 import OpenAPI, ...
+from openapi_pydantic.v3.v3_0.util import PydanticSchema, construct_open_api_with_schema_class
 ```
 
 ### Pydantic version compatibility

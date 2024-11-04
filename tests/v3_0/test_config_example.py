@@ -1,7 +1,7 @@
 from typing import Any
 
 from openapi_pydantic.compat import PYDANTIC_V2
-from openapi_pydantic.v3.v3_0_3 import (
+from openapi_pydantic.v3.v3_0 import (
     XML,
     Callback,
     Components,

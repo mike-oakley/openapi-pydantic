@@ -18,7 +18,7 @@ from .tag import Tag
 class OpenAPI(BaseModel):
     """This is the root document object of the OpenAPI document."""
 
-    openapi: Literal["3.1.0"] = "3.1.0"
+    openapi: Literal["3.1.1", "3.1.0"] = "3.1.1"
     """
     **REQUIRED**. This string MUST be the [version number](#versions)
     of the OpenAPI Specification that the OpenAPI document uses.

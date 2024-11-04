@@ -1,4 +1,4 @@
-from openapi_pydantic.v3.v3_1_0.schema import Schema, schema_validate
+from openapi_pydantic.v3.v3_1.schema import Schema, schema_validate
 
 
 def test_empty_schema() -> None:

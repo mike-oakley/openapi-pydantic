@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field
 
 from openapi_pydantic.compat import PYDANTIC_V2
 
-from .v3_0_3 import OpenAPI as OpenAPIv3_0
-from .v3_1_0 import OpenAPI as OpenAPIv3_1
+from .v3_0 import OpenAPI as OpenAPIv3_0
+from .v3_1 import OpenAPI as OpenAPIv3_1
 
 OpenAPIv3 = Union[OpenAPIv3_1, OpenAPIv3_0]
 
