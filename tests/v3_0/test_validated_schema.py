@@ -4,7 +4,7 @@ import sys
 from typing import Any, Optional
 
 from openapi_spec_validator import validate
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from openapi_pydantic.compat import PYDANTIC_V2
 from openapi_pydantic.v3.v3_0 import (
@@ -38,6 +38,23 @@ def test_basic_schema() -> None:
         optional: Optional[bool] = None
         one_literal_choice: Literal["only_choice"]
         multiple_literal_choices: Literal["choice1", "choice2"]
+
+    part_api = construct_sample_api(SampleModel)
+
+    api = construct_open_api_with_schema_class(part_api)
+    assert api.components is not None
+    assert api.components.schemas is not None
+
+    if PYDANTIC_V2:
+        json_api: Any = api.model_dump(mode="json", by_alias=True, exclude_none=True)
+    else:
+        json_api: Any = api.dict(by_alias=True, exclude_none=True)
+    validate(json_api)
+
+
+def test_field_with_examples() -> None:
+    class SampleModel(BaseModel):
+        field: str = Field(default="default", examples=["example1", "example2"])
 
     part_api = construct_sample_api(SampleModel)
 
