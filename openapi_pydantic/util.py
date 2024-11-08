@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any, Dict, Generic, List, Optional, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel
@@ -170,6 +171,9 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
 
 
 def _construct_ref_obj(pydantic_schema: PydanticSchema[PydanticType]) -> Reference:
-    ref_obj = Reference(**{"$ref": ref_prefix + pydantic_schema.schema_class.__name__})
+    ref_name = re.sub(
+        r"[^a-zA-Z0-9.\-_]", "_", pydantic_schema.schema_class.__name__
+    ).replace(".", "__")
+    ref_obj = Reference(**{"$ref": ref_prefix + ref_name})
     logger.debug(f"ref_obj={ref_obj}")
     return ref_obj
