@@ -3,9 +3,6 @@
 import sys
 from typing import Any, Optional
 
-from openapi_spec_validator import validate
-from pydantic import BaseModel, Field
-
 from openapi_pydantic.compat import PYDANTIC_V2
 from openapi_pydantic.v3.v3_0 import (
     Components,
@@ -25,6 +22,8 @@ from openapi_pydantic.v3.v3_0.util import (
     PydanticSchema,
     construct_open_api_with_schema_class,
 )
+from openapi_spec_validator import validate
+from pydantic import BaseModel, Field
 
 if sys.version_info < (3, 9):
     from typing_extensions import Literal
@@ -66,6 +65,28 @@ def test_field_with_examples() -> None:
         json_api: Any = api.model_dump(mode="json", by_alias=True, exclude_none=True)
     else:
         json_api: Any = api.dict(by_alias=True, exclude_none=True)
+    assert json_api["components"]["schemas"]["SampleRequest"]["properties"]["field"]["example"] == ["example1", "example2"]
+    assert json_api["components"]["schemas"]["SampleResponse"]["properties"]["field"]["example"] == ["example1", "example2"]
+    validate(json_api)
+
+
+def test_field_with_example() -> None:
+    class SampleModel(BaseModel):
+        field: str = Field(default="default", json_schema_extra={"example": "example1"})
+
+    part_api = construct_sample_api(SampleModel)
+
+    api = construct_open_api_with_schema_class(part_api)
+    assert api.components is not None
+    assert api.components.schemas is not None
+
+    if PYDANTIC_V2:
+        json_api: Any = api.model_dump(mode="json", by_alias=True, exclude_none=True)
+    else:
+        json_api: Any = api.dict(by_alias=True, exclude_none=True)
+
+    assert json_api["components"]["schemas"]["SampleRequest"]["properties"]["field"]["example"] == "example1"
+    assert json_api["components"]["schemas"]["SampleResponse"]["properties"]["field"]["example"] == "example1"
     validate(json_api)
 
 
