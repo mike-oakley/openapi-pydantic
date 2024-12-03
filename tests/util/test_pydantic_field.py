@@ -15,7 +15,13 @@ from openapi_pydantic import (
     Response,
     Schema,
 )
-from openapi_pydantic.compat import DEFS_KEY, PYDANTIC_V2, models_json_schema, v1_schema
+from openapi_pydantic.compat import (
+    DEFS_KEY,
+    PYDANTIC_MINOR_VERSION,
+    PYDANTIC_V2,
+    models_json_schema,
+    v1_schema,
+)
 from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
 
 
@@ -67,6 +73,10 @@ def test_pydantic_discriminator_schema_generation() -> None:
         # In Pydantic v2, string literal types are mapped to consts.
         a_kind["const"] = "a"
         b_kind["const"] = "b"
+        if PYDANTIC_MINOR_VERSION < 10:
+            # Prior to 2.10, string literal types are also mapped to enums with a single entry.
+            a_kind["enum"] = ["a"]
+            b_kind["enum"] = ["b"]
     else:
         json_schema = v1_schema([RequestModel])
         # In Pydantic v1, string literal types are mapped to enums with a single entry.
