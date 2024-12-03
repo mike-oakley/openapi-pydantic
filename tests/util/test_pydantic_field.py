@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Dict, List, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
@@ -59,8 +59,8 @@ def construct_base_open_api() -> OpenAPI:
 def test_pydantic_discriminator_schema_generation() -> None:
     """https://github.com/kuimono/openapi-schema-pydantic/issues/8"""
 
-    a_kind: dict[str, Union[str, list[str]]] = {"title": "Kind", "type": "string"}
-    b_kind: dict[str, Union[str, list[str]]] = {"title": "Kind", "type": "string"}
+    a_kind: Dict[str, Union[str, List[str]]] = {"title": "Kind", "type": "string"}
+    b_kind: Dict[str, Union[str, List[str]]] = {"title": "Kind", "type": "string"}
 
     if PYDANTIC_V2:
         _key_map, json_schema = models_json_schema([(RequestModel, "validation")])
