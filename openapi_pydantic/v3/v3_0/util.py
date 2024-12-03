@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -242,6 +243,18 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
 
 
 def _construct_ref_obj(pydantic_schema: PydanticSchema[PydanticType]) -> Reference:
-    ref_obj = Reference(**{"$ref": ref_prefix + pydantic_schema.schema_class.__name__})
+    """
+    Construct a reference object from the Pydantic schema name
+
+    characters in the schema name that are invalid/problematic
+    for JSONschema $ref names will get replaced with underscores.
+    Especially needed for Pydantic generic Models with brackets "[]"
+
+    see: https://github.com/pydantic/pydantic/blob/aee6057378ccfec02126bf9c984a9b6d6b411777/pydantic/json_schema.py#L2031
+    """
+    ref_name = re.sub(
+        r"[^a-zA-Z0-9.\-_]", "_", pydantic_schema.schema_class.__name__
+    ).replace(".", "__")
+    ref_obj = Reference(**{"$ref": ref_prefix + ref_name})
     logger.debug(f"ref_obj={ref_obj}")
     return ref_obj
