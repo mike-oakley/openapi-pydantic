@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Dict, List, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
@@ -15,7 +15,13 @@ from openapi_pydantic import (
     Response,
     Schema,
 )
-from openapi_pydantic.compat import DEFS_KEY, PYDANTIC_V2, models_json_schema, v1_schema
+from openapi_pydantic.compat import (
+    DEFS_KEY,
+    PYDANTIC_MINOR_VERSION,
+    PYDANTIC_V2,
+    models_json_schema,
+    v1_schema,
+)
 from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
 
 
@@ -59,15 +65,23 @@ def construct_base_open_api() -> OpenAPI:
 def test_pydantic_discriminator_schema_generation() -> None:
     """https://github.com/kuimono/openapi-schema-pydantic/issues/8"""
 
-    a_kind = {"const": "a", "enum": ["a"], "title": "Kind", "type": "string"}
-    b_kind = {"const": "b", "enum": ["b"], "title": "Kind", "type": "string"}
+    a_kind: Dict[str, Union[str, List[str]]] = {"title": "Kind", "type": "string"}
+    b_kind: Dict[str, Union[str, List[str]]] = {"title": "Kind", "type": "string"}
 
     if PYDANTIC_V2:
         _key_map, json_schema = models_json_schema([(RequestModel, "validation")])
+        # In Pydantic v2, string literal types are mapped to consts.
+        a_kind["const"] = "a"
+        b_kind["const"] = "b"
+        if PYDANTIC_MINOR_VERSION < 10:
+            # Prior to 2.10, string literal types are also mapped to enums with a single entry.
+            a_kind["enum"] = ["a"]
+            b_kind["enum"] = ["b"]
     else:
         json_schema = v1_schema([RequestModel])
-        a_kind.pop("const")
-        b_kind.pop("const")
+        # In Pydantic v1, string literal types are mapped to enums with a single entry.
+        a_kind["enum"] = ["a"]
+        b_kind["enum"] = ["b"]
 
     assert json_schema == {
         DEFS_KEY: {
