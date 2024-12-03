@@ -59,15 +59,19 @@ def construct_base_open_api() -> OpenAPI:
 def test_pydantic_discriminator_schema_generation() -> None:
     """https://github.com/kuimono/openapi-schema-pydantic/issues/8"""
 
-    a_kind = {"const": "a", "enum": ["a"], "title": "Kind", "type": "string"}
-    b_kind = {"const": "b", "enum": ["b"], "title": "Kind", "type": "string"}
+    a_kind: dict[str, Union[str, list[str]]] = {"title": "Kind", "type": "string"}
+    b_kind: dict[str, Union[str, list[str]]] = {"title": "Kind", "type": "string"}
 
     if PYDANTIC_V2:
         _key_map, json_schema = models_json_schema([(RequestModel, "validation")])
+        # In Pydantic v2, string literal types are mapped to consts.
+        a_kind["const"] = "a"
+        b_kind["const"] = "b"
     else:
         json_schema = v1_schema([RequestModel])
-        a_kind.pop("const")
-        b_kind.pop("const")
+        # In Pydantic v1, string literal types are mapped to enums with a single entry.
+        a_kind["enum"] = ["a"]
+        b_kind["enum"] = ["b"]
 
     assert json_schema == {
         DEFS_KEY: {
