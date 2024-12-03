@@ -1,6 +1,7 @@
 import logging
-from typing import Callable, Literal
+from typing import Callable, Generic, Literal, TypeVar
 
+import pytest
 from pydantic import BaseModel, Field
 
 from openapi_pydantic.compat import PYDANTIC_V2
@@ -72,6 +73,43 @@ def test_construct_open_api_with_schema_class_3() -> None:
     assert schema_without_alias.properties is not None
     assert "resp_foo" in schema_without_alias.properties
     assert "resp_bar" in schema_without_alias.properties
+
+
+@pytest.mark.skipif(PYDANTIC_V2, reason="generic type for Pydantic V1")
+def test_construct_open_api_with_schema_class_4_generic_response_v1() -> None:
+    DataT = TypeVar("DataT")
+    from pydantic.v1.generics import GenericModel
+
+    class GenericResponse(GenericModel, Generic[DataT]):
+        msg: str = Field(description="message of the generic response")
+        data: DataT = Field(description="data value of the generic response")
+
+    open_api_4 = construct_base_open_api_4_generic_response(
+        GenericResponse[PongResponse]
+    )
+
+    result = construct_open_api_with_schema_class(open_api_4)
+    assert result.components is not None
+    assert result.components.schemas is not None
+    assert "GenericResponse_PongResponse_" in result.components.schemas
+
+
+@pytest.mark.skipif(not PYDANTIC_V2, reason="generic type for Pydantic V2")
+def test_construct_open_api_with_schema_class_4_generic_response() -> None:
+    DataT = TypeVar("DataT")
+
+    class GenericResponse(BaseModel, Generic[DataT]):
+        msg: str = Field(description="message of the generic response")
+        data: DataT = Field(description="data value of the generic response")
+
+    open_api_4 = construct_base_open_api_4_generic_response(
+        GenericResponse[PongResponse]
+    )
+
+    result = construct_open_api_with_schema_class(open_api_4)
+    assert result.components is not None
+    assert result.components.schemas is not None
+    assert "GenericResponse_PongResponse_" in result.components.schemas
 
 
 def construct_base_open_api_1() -> OpenAPI:
@@ -204,6 +242,42 @@ def construct_base_open_api_3_plus() -> OpenAPI:
                                 "application/json": MediaType(
                                     media_type_schema=PydanticSchema(
                                         schema_class=PongResponse
+                                    )
+                                )
+                            },
+                        )
+                    },
+                )
+            )
+        },
+    )
+
+
+def construct_base_open_api_4_generic_response(response_schema: type) -> OpenAPI:
+    return OpenAPI(
+        info=Info(
+            title="My own API",
+            version="v0.0.1",
+        ),
+        paths={
+            "/ping": PathItem(
+                post=Operation(
+                    requestBody=RequestBody(
+                        content={
+                            "application/json": MediaType(
+                                media_type_schema=PydanticSchema(
+                                    schema_class=PingRequest
+                                )
+                            )
+                        }
+                    ),
+                    responses={
+                        "200": Response(
+                            description="pong",
+                            content={
+                                "application/json": MediaType(
+                                    media_type_schema=PydanticSchema(
+                                        schema_class=response_schema
                                     )
                                 )
                             },
