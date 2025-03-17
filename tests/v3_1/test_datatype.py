@@ -33,3 +33,14 @@ def test_bad_types_raise_validation_errors() -> None:
                 "a": Schema(type="invalid"),
             },
         )
+
+
+def test_enum_schema() -> None:
+    schema = Schema(type="string", enum=["value1", "value2", "value3"])
+    assert schema.enum == ["value1", "value2", "value3"]
+
+    with pytest.raises(ValidationError):
+        Schema(type="string", enum="invalid_enum")
+
+    with pytest.raises(ValidationError):
+        Schema(type="string", enum=["value1", 2, "value3"])

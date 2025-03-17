@@ -309,6 +309,25 @@ from openapi_pydantic.v3.v3_0 import OpenAPI, ...
 from openapi_pydantic.v3.v3_0.util import PydanticSchema, construct_open_api_with_schema_class
 ```
 
+### Enum Schema Support
+
+The library now supports processing enum schema types. The `enum` field in the `Schema` class is utilized and referenced in the codebase to process enum schema types.
+
+Example:
+
+```python
+from openapi_pydantic.v3.v3_0 import Schema as SchemaV3_0
+from openapi_pydantic.v3.v3_1 import Schema as SchemaV3_1
+
+# OpenAPI 3.0
+schema_v3_0 = SchemaV3_0(type="string", enum=["value1", "value2", "value3"])
+print(schema_v3_0.enum)  # Output: ['value1', 'value2', 'value3']
+
+# OpenAPI 3.1
+schema_v3_1 = SchemaV3_1(type="string", enum=["value1", "value2", "value3"])
+print(schema_v3_1.enum)  # Output: ['value1', 'value2', 'value3']
+```
+
 ### Pydantic version compatibility
 
 Compatibility with both major versions of Pydantic (1.8+ and 2.*) is mostly achieved using a module called `compat.py`. It detects the installed version of Pydantic and exports version-specific symbols for use by the rest of the package. It also provides all symbols necessary for type checking. The `compat.py` module is not intended to be imported by other packages, but other packages may find it helpful as an example of how to span major versions of Pydantic.
