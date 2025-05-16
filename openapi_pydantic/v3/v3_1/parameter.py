@@ -76,8 +76,7 @@ class ParameterLocation(str, enum.Enum):
 
 
 class ParameterBase(BaseModel):
-    """
-    Base class for Parameter and Header.
+    """Base class for Parameter and Header.
 
     (Header is like Parameter, but has no `name` or `in` fields.)
     """
@@ -86,14 +85,14 @@ class ParameterBase(BaseModel):
     """
     A brief description of the parameter.
     This could contain examples of use.
-    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text 
+    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text
     representation.
     """
 
     required: bool = False
     """
     Determines whether this parameter is mandatory.
-    If the [parameter location](#parameterIn) is `"path"`, this property is 
+    If the [parameter location](#parameterIn) is `"path"`, this property is
     **REQUIRED** and its value MUST be `true`.
     Otherwise, the property MAY be included and its default value is `false`.
     """
@@ -106,9 +105,9 @@ class ParameterBase(BaseModel):
 
     style: Optional[str] = None
     """
-    Describes how the parameter value will be serialized depending on the type of the 
+    Describes how the parameter value will be serialized depending on the type of the
     parameter value. Default values (based on value of `in`):
-    
+
     - for `query` - `form`;
     - for `path` - `simple`;
     - for `header` - `simple`;
@@ -117,7 +116,7 @@ class ParameterBase(BaseModel):
 
     explode: Optional[bool] = None
     """
-    When this is true, parameter values of type `array` or `object` generate separate 
+    When this is true, parameter values of type `array` or `object` generate separate
     parameters for each value of the array or key-value pair of the map.
     For other types of parameters this property has no effect.
     When [`style`](#parameterStyle) is `form`, the default value is `true`.
@@ -136,26 +135,26 @@ class ParameterBase(BaseModel):
     Example of the parameter's potential value.
     The example SHOULD match the specified schema and encoding properties if present.
     The `example` field is mutually exclusive of the `examples` field.
-    Furthermore, if referencing a `schema` that contains an example, 
+    Furthermore, if referencing a `schema` that contains an example,
     the `example` value SHALL _override_ the example provided by the schema.
-    To represent examples of media types that cannot naturally be represented in JSON 
+    To represent examples of media types that cannot naturally be represented in JSON
     or YAML, a string value can contain the example with escaping where necessary.
     """
 
     examples: Optional[Dict[str, Union[Example, Reference]]] = None
     """
     Examples of the parameter's potential value.
-    Each example SHOULD contain a value in the correct format as specified in the 
-    parameter encoding. The `examples` field is mutually exclusive of the `example` 
+    Each example SHOULD contain a value in the correct format as specified in the
+    parameter encoding. The `examples` field is mutually exclusive of the `example`
     field.
     Furthermore, if referencing a `schema` that contains an example,
     the `examples` value SHALL _override_ the example provided by the schema.
     """
 
     """
-    For more complex scenarios, the [`content`](#parameterContent) property 
+    For more complex scenarios, the [`content`](#parameterContent) property
     can define the media type and schema of the parameter.
-    A parameter MUST contain either a `schema` property, or a `content` property, but 
+    A parameter MUST contain either a `schema` property, or a `content` property, but
     not both.
     When `example` or `examples` are provided in conjunction with the `schema` object,
     the example MUST follow the prescribed serialization strategy for the parameter.
@@ -184,8 +183,7 @@ class ParameterBase(BaseModel):
 
 
 class Parameter(ParameterBase):
-    """
-    Describes a single operation parameter.
+    """Describes a single operation parameter.
 
     A unique parameter is defined by a combination of a [name](#parameterName) and
     [location](#parameterIn).
@@ -217,11 +215,11 @@ class Parameter(ParameterBase):
     allowEmptyValue: bool = False
     """
     Sets the ability to pass empty-valued parameters.
-    This is valid only for `query` parameters and allows sending a parameter with an 
+    This is valid only for `query` parameters and allows sending a parameter with an
     empty value. Default value is `false`.
-    If [`style`](#parameterStyle) is used, and if behavior is `n/a` (cannot be 
+    If [`style`](#parameterStyle) is used, and if behavior is `n/a` (cannot be
     serialized), the value of `allowEmptyValue` SHALL be ignored.
-    Use of this property is NOT RECOMMENDED, as it is likely to be removed in a later 
+    Use of this property is NOT RECOMMENDED, as it is likely to be removed in a later
     revision.
     """
 

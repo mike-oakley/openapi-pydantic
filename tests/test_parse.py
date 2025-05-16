@@ -8,7 +8,7 @@ from openapi_pydantic.v3 import v3_0, v3_1
 
 @pytest.mark.parametrize("version", ["3.0.4", "3.0.3", "3.0.2", "3.0.1", "3.0.0"])
 def test_parse_obj_3_0(
-    version: Literal["3.0.4", "3.0.3", "3.0.2", "3.0.1", "3.0.0"]
+    version: Literal["3.0.4", "3.0.3", "3.0.2", "3.0.1", "3.0.0"],
 ) -> None:
     result = parse_obj(
         {

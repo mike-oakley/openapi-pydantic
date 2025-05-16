@@ -23,7 +23,7 @@ A [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) co
 Please ensure all changes have good test coverage and are formatted correctly. You can run the test
 suite and linters using [tox](https://tox.wiki/en/latest/) - just run `tox` from the root of this
 repo to run the checks. These will also be run automatically in CI once your PR is opened. Don't
-worry about testing against every Ptyhon version - the CI action will do this for you!
+worry about testing against every Python version - the CI action will do this for you!
 
 ### Tagging
 

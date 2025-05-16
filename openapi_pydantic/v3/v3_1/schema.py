@@ -110,8 +110,8 @@ _examples = [
 
 
 class Schema(BaseModel):
-    """
-    The Schema Object allows the definition of input and output data types.
+    """The Schema Object allows the definition of input and output data types.
+
     These types can be objects, but also primitives and arrays.
     This object is a superset of
     the [JSON Schema Specification Draft 2020-12](https://tools.ietf.org/html/draft-bhutton-json-schema-00).
@@ -128,7 +128,7 @@ class Schema(BaseModel):
     """
 
     """
-    The following properties are taken directly from the 
+    The following properties are taken directly from the
     [JSON Schema Core](https://tools.ietf.org/html/draft-wright-json-schema-00)
     and follow the same specifications:
     """
@@ -202,7 +202,7 @@ class Schema(BaseModel):
     its subschema, then validation succeeds against this keyword if the
     instance also successfully validates against this keyword's
     subschema.
-   
+
     This keyword has no effect when "if" is absent, or when the instance
     fails to validate against its subschema.  Implementations MUST NOT
     evaluate the instance against this keyword, for either validation or
@@ -298,7 +298,7 @@ class Schema(BaseModel):
     applied to every array element even after the first match has been
     found, in order to collect annotations for use by other keywords.
     This is to ensure that all possible annotations are collected.
-    
+
     Logically, the validation result of applying the value subschema to
     each item in the array MUST be ORed with "false", resulting in an
     overall validation result.
@@ -458,7 +458,7 @@ class Schema(BaseModel):
     """
 
     """
-    The following properties are taken directly from the 
+    The following properties are taken directly from the
     [JSON Schema Validation](https://tools.ietf.org/html/draft-wright-json-schema-validation-00)
     and follow the same specifications:
     """
@@ -472,7 +472,7 @@ class Schema(BaseModel):
     String values MUST be one of the six primitive types ("null",
     "boolean", "object", "array", "number", or "string"), or "integer"
     which matches any number with a zero fractional part.
-    
+
     An instance validates if and only if the instance is in any of the
     sets listed for this keyword.
     """
@@ -481,17 +481,17 @@ class Schema(BaseModel):
     """
     The value of this keyword MUST be an array.  This array SHOULD have
     at least one element.  Elements in the array SHOULD be unique.
-    
+
     An instance validates successfully against this keyword if its value
     is equal to one of the elements in this keyword's array value.
-    
+
     Elements in the array might be of any type, including null.
     """
 
     const: Optional[Any] = None
     """
     The value of this keyword MAY be of any type, including null.
-    
+
     Use of this keyword is functionally equivalent to an "enum"
     (Section 6.1.2) with a single value.
 
@@ -695,9 +695,9 @@ class Schema(BaseModel):
     """
     From OpenAPI:
     See [Data Type Formats](#dataTypeFormat) for further details.
-    While relying on JSON Schema's defined formats, the OAS offers a few additional 
+    While relying on JSON Schema's defined formats, the OAS offers a few additional
     predefined formats.
-    
+
     From JSON Schema:
     Structural validation alone may be insufficient to allow an
     application to correctly utilize certain values.  The "format"
@@ -780,9 +780,9 @@ class Schema(BaseModel):
     description: Optional[str] = None
     """
     From OpenAPI:
-    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text 
+    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text
     representation.
-    
+
     From JSON Schema:
     The value "description" MUST be a string.
 
@@ -804,7 +804,7 @@ class Schema(BaseModel):
     """
 
     deprecated: Optional[bool] = None
-    """ 
+    """
     The value of this keyword MUST be a boolean.  When multiple
     occurrences of this keyword are applicable to a single sub-instance,
     applications SHOULD consider the instance location to be deprecated
@@ -892,7 +892,7 @@ class Schema(BaseModel):
     occurrences of this keyword are applicable to a single sub-instance,
     implementations MUST provide a flat array of all values rather than
     an array of arrays.
-    
+
     This keyword can be used to provide sample JSON values associated
     with a particular schema, for the purpose of illustrating usage.  It
     is RECOMMENDED that these values be valid against the associated
@@ -910,7 +910,7 @@ class Schema(BaseModel):
     discriminator: Optional[Discriminator] = None
     """
     Adds support for polymorphism.
-    The discriminator is an object name that is used to differentiate between other 
+    The discriminator is an object name that is used to differentiate between other
     schemas which may satisfy the payload description.
     See [Composition and Inheritance](#schemaComposition) for more details.
     """
@@ -932,10 +932,10 @@ class Schema(BaseModel):
     A free-form property to include an example of an instance for this schema.
     To represent examples that cannot be naturally represented in JSON or YAML,
     a string value can be used to contain the example with escaping where necessary.
-    
-    Deprecated: The example property has been deprecated in favor of the JSON Schema 
+
+    Deprecated: The example property has been deprecated in favor of the JSON Schema
     examples keyword.
-    Use of example is discouraged, and later versions of this specification may remove 
+    Use of example is discouraged, and later versions of this specification may remove
     it.
     """
 
@@ -961,8 +961,10 @@ if TYPE_CHECKING:
         *,
         strict: Optional[bool] = None,
         from_attributes: Optional[bool] = None,
-        context: Optional[Dict[str, Any]] = None
-    ) -> Schema: ...
+        context: Optional[Dict[str, Any]] = None,
+    ) -> Schema:
+        """Validate a pydantic model instance."""
+        ...
 
 elif PYDANTIC_V2:
     schema_validate = Schema.model_validate

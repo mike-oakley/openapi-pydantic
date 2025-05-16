@@ -40,8 +40,7 @@ _examples = [
 
 
 class MediaType(BaseModel):
-    """Each Media Type Object provides schema and examples for the media type
-    identified by its key."""
+    """Provides schema and examples for the media type identified by its key."""
 
     media_type_schema: Optional[Union[Reference, Schema]] = Field(
         default=None, alias="schema"
@@ -53,11 +52,11 @@ class MediaType(BaseModel):
     example: Optional[Any] = None
     """
     Example of the media type.
-    
+
     The example object SHOULD be in the correct format as specified by the media type.
-    
+
     The `example` field is mutually exclusive of the `examples` field.
-    
+
     Furthermore, if referencing a `schema` which contains an example,
     the `example` value SHALL _override_ the example provided by the schema.
     """
@@ -65,11 +64,11 @@ class MediaType(BaseModel):
     examples: Optional[Dict[str, Union[Example, Reference]]] = None
     """
     Examples of the media type.
-    
+
     Each example object SHOULD match the media type and specified schema if present.
-    
+
     The `examples` field is mutually exclusive of the `example` field.
-    
+
     Furthermore, if referencing a `schema` which contains an example,
     the `examples` value SHALL _override_ the example provided by the schema.
     """

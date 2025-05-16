@@ -1,3 +1,5 @@
+"""OpenAPI schema interface utilizing Pydantic."""
+
 import logging
 
 from .v3 import XML as XML

@@ -10,9 +10,8 @@ _examples = [{"name": "pet", "description": "Pets operations"}]
 
 
 class Tag(BaseModel):
-    """
-    Adds metadata to a single tag that is used by the
-    [Operation Object](#operationObject).
+    """Adds metadata to a tag that is used by the [Operation Object](#operationObject).
+
     It is not mandatory to have a Tag Object per tag defined in the Operation Object
     instances.
     """
@@ -25,7 +24,8 @@ class Tag(BaseModel):
     description: Optional[str] = None
     """
     A short description for the tag.
-    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text 
+
+    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text
     representation.
     """
 

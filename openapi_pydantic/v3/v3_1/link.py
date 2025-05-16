@@ -19,8 +19,8 @@ _examples = [
 
 
 class Link(BaseModel):
-    """
-    The `Link object` represents a possible design-time link for a response.
+    """The `Link object` represents a possible design-time link for a response.
+
     The presence of a link does not guarantee the caller's ability to successfully
     invoke it, rather it provides a known relationship and traversal mechanism between
     responses and other operations.
@@ -38,16 +38,16 @@ class Link(BaseModel):
     A relative or absolute URI reference to an OAS operation.
     This field is mutually exclusive of the `operationId` field,
     and MUST point to an [Operation Object](#operationObject).
-    Relative `operationRef` values MAY be used to locate an existing 
-    [Operation Object](#operationObject) in the OpenAPI definition. See the rules for 
+    Relative `operationRef` values MAY be used to locate an existing
+    [Operation Object](#operationObject) in the OpenAPI definition. See the rules for
     resolving [Relative References](#relativeReferencesURI).
     """
 
     operationId: Optional[str] = None
     """
-    The name of an _existing_, resolvable OAS operation, as defined with a unique 
+    The name of an _existing_, resolvable OAS operation, as defined with a unique
     `operationId`.
-    
+
     This field is mutually exclusive of the `operationRef` field.
     """
 
@@ -56,24 +56,24 @@ class Link(BaseModel):
     A map representing parameters to pass to an operation
     as specified with `operationId` or identified via `operationRef`.
     The key is the parameter name to be used,
-    whereas the value can be a constant or an expression to be evaluated and passed to 
+    whereas the value can be a constant or an expression to be evaluated and passed to
     the linked operation.
-    
-    The parameter name can be qualified using the [parameter location](#parameterIn) 
-    `[{in}.]{name}` for operations that use the same parameter name in different 
+
+    The parameter name can be qualified using the [parameter location](#parameterIn)
+    `[{in}.]{name}` for operations that use the same parameter name in different
     locations (e.g. path.id).
     """
 
     requestBody: Optional[Any] = None
     """
-    A literal value or [{expression}](#runtimeExpression) to use as a request body when 
+    A literal value or [{expression}](#runtimeExpression) to use as a request body when
     calling the target operation.
     """
 
     description: Optional[str] = None
     """
     A description of the link.
-    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text 
+    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text
     representation.
     """
 

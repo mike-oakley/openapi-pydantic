@@ -9,15 +9,15 @@ from openapi_pydantic.v3.v3_0 import OpenAPI, Operation, PathItem
 def test_swagger_openapi_v3() -> None:
     with open("tests/data/swagger_openapi_v3.0.1.json") as f:
         if PYDANTIC_V2:
-            validate = getattr(ExtendedOpenAPI, "model_validate_json")
+            validate = ExtendedOpenAPI.model_validate_json
         else:
-            validate = getattr(ExtendedOpenAPI, "parse_raw")
+            validate = ExtendedOpenAPI.parse_raw  # type: ignore[assignment]
         open_api = validate(f.read())
     assert open_api
 
 
 class ExtendedOperation(Operation):
-    """Override classes to use "x-codegen-request-body-name" in Operation"""
+    """Override classes to use "x-codegen-request-body-name" in Operation."""
 
     xCodegenRequestBodyName: Optional[str] = Field(
         default=None, alias="x-codegen-request-body-name"

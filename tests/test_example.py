@@ -21,7 +21,7 @@ def test_readme_example() -> None:
 
 
 def readme_example_1() -> OpenAPI:
-    """Construct OpenAPI using data class"""
+    """Construct OpenAPI using data class."""
     return OpenAPI(
         info=Info(
             title="My own API",
@@ -36,7 +36,7 @@ def readme_example_1() -> OpenAPI:
 
 
 def readme_example_2() -> OpenAPI:
-    """Construct OpenAPI from raw data object"""
+    """Construct OpenAPI from raw data object."""
     openapi_validate: Callable[[dict], OpenAPI] = getattr(
         OpenAPI, "model_validate" if PYDANTIC_V2 else "parse_obj"
     )
@@ -51,7 +51,7 @@ def readme_example_2() -> OpenAPI:
 
 
 def readme_example_3() -> OpenAPI:
-    """Construct OpenAPI from mixed object"""
+    """Construct OpenAPI from mixed object."""
     openapi_validate: Callable[[dict], OpenAPI] = getattr(
         OpenAPI, "model_validate" if PYDANTIC_V2 else "parse_obj"
     )

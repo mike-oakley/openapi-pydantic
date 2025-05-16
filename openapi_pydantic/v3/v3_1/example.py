@@ -21,6 +21,8 @@ _examples = [
 
 
 class Example(BaseModel):
+    """Example object."""
+
     summary: Optional[str] = None
     """
     Short description for the example.
@@ -29,7 +31,7 @@ class Example(BaseModel):
     description: Optional[str] = None
     """
     Long description for the example.
-    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text 
+    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text
     representation.
     """
 
@@ -37,16 +39,16 @@ class Example(BaseModel):
     """
     Embedded literal example.
     The `value` field and `externalValue` field are mutually exclusive.
-    To represent examples of media types that cannot naturally represented in JSON or 
+    To represent examples of media types that cannot naturally represented in JSON or
     YAML, use a string value to contain the example, escaping where necessary.
     """
 
     externalValue: Optional[str] = None
     """
     A URL that points to the literal example.
-    This provides the capability to reference examples that cannot easily be included 
+    This provides the capability to reference examples that cannot easily be included
     in JSON or YAML documents.
-    
+
     The `value` field and `externalValue` field are mutually exclusive.
     See the rules for resolving [Relative References](#relativeReferencesURI).
     """

@@ -10,7 +10,7 @@ class ServerVariable(BaseModel):
 
     enum: Optional[List[str]] = None
     """
-    An enumeration of string values to be used if the substitution options are from a 
+    An enumeration of string values to be used if the substitution options are from a
     limited set. The array SHOULD NOT be empty.
     """
 
@@ -18,16 +18,16 @@ class ServerVariable(BaseModel):
     """
     **REQUIRED**. The default value to use for substitution,
     which SHALL be sent if an alternate value is _not_ supplied.
-    Note this behavior is different than the [Schema Object's](#schemaObject) treatment 
+    Note this behavior is different than the [Schema Object's](#schemaObject) treatment
     of default values, because in those cases parameter values are optional.
-    If the [`enum`](#serverVariableEnum) is defined, the value MUST exist in the enum's 
+    If the [`enum`](#serverVariableEnum) is defined, the value MUST exist in the enum's
     values.
     """
 
     description: Optional[str] = None
     """
     An optional description for the server variable.
-    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text 
+    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text
     representation.
     """
 
