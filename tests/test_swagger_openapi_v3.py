@@ -9,9 +9,9 @@ from openapi_pydantic.v3.v3_0 import OpenAPI, Operation, PathItem
 def test_swagger_openapi_v3() -> None:
     with open("tests/data/swagger_openapi_v3.0.1.json") as f:
         if PYDANTIC_V2:
-            validate = ExtendedOpenAPI.model_validate_json
+            validate = getattr(ExtendedOpenAPI, "model_validate_json")  # noqa: B009
         else:
-            validate = ExtendedOpenAPI.parse_raw  # type: ignore[assignment]
+            validate = getattr(ExtendedOpenAPI, "parse_raw")  # noqa: B009
         open_api = validate(f.read())
     assert open_api
 
