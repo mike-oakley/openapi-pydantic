@@ -34,7 +34,6 @@ pytest-cov = "^5.0.0"
 openapi-spec-validator = "^0.7.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.4.2"
 mypy = "^1.8.0"
 pre-commit = "^2.16.0"
 ruff = "^0.7.2"
@@ -55,3 +54,63 @@ implicit_reexport = false
 show_error_codes = true
 files = ["openapi_pydantic/", "tests/"]
 plugins = ["pydantic.mypy"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+include = ["openapi_pydantic/**/*.py", "tests/**/*.py"]
+
+[tool.ruff.lint]
+select = [
+    # https://docs.astral.sh/ruff/rules/#pydocstyle-d
+    "D",
+    # https://docs.astral.sh/ruff/rules/#error-e
+    "E",
+    # https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "F",
+    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "B",
+    # https://docs.astral.sh/ruff/rules/#isort-i
+    "I",
+    # https://docs.astral.sh/ruff/rules/complex-structure/
+    "C901",
+    # https://docs.astral.sh/ruff/rules/#warning-w
+    "W",
+]
+
+ignore = [
+    # Lint rules which are recommended to be disabled when using the ruff formatter.
+    # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+    "W191",
+    "E111",
+    "E114",
+    "E117",
+    "D100",
+    "D106",
+    "D206",
+    "D300",
+    "Q000",
+    "Q001",
+    "Q002",
+    "Q003",
+    "COM812",
+    "COM819",
+    "ISC001",
+    "ISC002",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["openapi_pydantic"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore docstring violations outside of the primer package.
+"!openapi_pydantic/**.py" = ["D"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false

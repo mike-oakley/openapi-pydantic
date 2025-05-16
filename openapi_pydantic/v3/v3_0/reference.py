@@ -10,8 +10,7 @@ _examples = [
 
 
 class Reference(BaseModel):
-    """
-    A simple object to allow referencing other components in the specification.
+    """A simple object to allow referencing other components in the specification.
 
     The Reference Object is defined by [JSON Reference](https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03)
     and follows the same structure, behavior and rules.

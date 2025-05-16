@@ -13,9 +13,7 @@ _examples = [
 
 
 class License(BaseModel):
-    """
-    License information for the exposed API.
-    """
+    """License information for the exposed API."""
 
     name: str
     """

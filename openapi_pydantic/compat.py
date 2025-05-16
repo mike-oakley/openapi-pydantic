@@ -1,4 +1,4 @@
-"""Compatibility layer to make this package usable with Pydantic 1 or 2"""
+"""Compatibility layer to make this package usable with Pydantic 1 or 2."""
 
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
@@ -34,18 +34,18 @@ if TYPE_CHECKING:
         json_schema_extra: Optional[Dict[str, Any]] = None,
         populate_by_name: bool = True,
     ) -> PydanticConfigDict:
-        """Stub for pydantic.ConfigDict in Pydantic 2"""
+        """Stub for pydantic.ConfigDict in Pydantic 2."""
         ...
 
     class Extra(Enum):
-        """Stub for pydantic.Extra in Pydantic 1"""
+        """Stub for pydantic.Extra in Pydantic 1."""
 
         allow = "allow"
         ignore = "ignore"
         forbid = "forbid"
 
     class RootModel(BaseModel):
-        """Stub for pydantic.RootModel in Pydantic 2"""
+        """Stub for pydantic.RootModel in Pydantic 2."""
 
     JsonSchemaMode = Literal["validation", "serialization"]
 
@@ -56,7 +56,7 @@ if TYPE_CHECKING:
         ref_template: str = "#/$defs/{model}",
         schema_generator: Optional[type] = None,
     ) -> Tuple[Dict, Dict[str, Any]]:
-        """Stub for pydantic.json_schema.models_json_schema in Pydantic 2"""
+        """Stub for pydantic.json_schema.models_json_schema in Pydantic 2."""
         ...
 
     def v1_schema(
@@ -65,7 +65,7 @@ if TYPE_CHECKING:
         by_alias: bool = True,
         ref_prefix: str = "#/$defs",
     ) -> Dict[str, Any]:
-        """Stub for pydantic.schema.schema in Pydantic 1"""
+        """Stub for pydantic.schema.schema in Pydantic 1."""
         ...
 
     DEFS_KEY = "$defs"
@@ -74,7 +74,7 @@ if TYPE_CHECKING:
         pass
 
     def min_length_arg(min_length: int) -> MinLengthArg:
-        """Generate a min_length or min_items parameter for Field(...)"""
+        """Generate a min_length or min_items parameter for Field(...)."""
         ...
 
 elif PYDANTIC_V2:
@@ -90,6 +90,7 @@ elif PYDANTIC_V2:
         min_length: int
 
     def min_length_arg(min_length: int) -> MinLengthArg:
+        """Generate a min_length or min_items parameter for Field(...)."""
         return {"min_length": min_length}
 
     # Create V1 stubs. These should not be used when PYDANTIC_V2 is true.
@@ -110,6 +111,7 @@ else:
         min_items: int
 
     def min_length_arg(min_length: int) -> MinLengthArg:
+        """Generate a min_length or min_items parameter for Field(...)."""
         return {"min_items": min_length}
 
     # Create V2 stubs. These should not be used when PYDANTIC_V2 is false.

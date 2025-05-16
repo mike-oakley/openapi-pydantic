@@ -34,7 +34,7 @@ ref_template = "#/components/schemas/{model}"
 
 
 class PydanticSchema(Schema, Generic[PydanticType]):
-    """Special `Schema` class to indicate a reference from pydantic class"""
+    """Special `Schema` class to indicate a reference from pydantic class."""
 
     schema_class: Type[PydanticType]
     """the class that is used for generate the schema"""
@@ -59,7 +59,8 @@ def get_mode(
 
 if TYPE_CHECKING:
 
-    class GenerateOpenAPI30Schema: ...
+    class GenerateOpenAPI30Schema:
+        """Modify the schema generation for OpenAPI 3.0."""
 
 elif PYDANTIC_V2:
     from enum import Enum
@@ -111,7 +112,8 @@ elif PYDANTIC_V2:
 
 else:
 
-    class GenerateOpenAPI30Schema: ...
+    class GenerateOpenAPI30Schema:
+        """Modify the schema generation for OpenAPI 3.0."""
 
 
 def construct_open_api_with_schema_class(
@@ -120,8 +122,7 @@ def construct_open_api_with_schema_class(
     scan_for_pydantic_schema_reference: bool = True,
     by_alias: bool = True,
 ) -> OpenAPI:
-    """
-    Construct a new OpenAPI object, utilising pydantic classes to produce JSON schemas.
+    """Construct an OpenAPI object, utilising Pydantic classes to produce JSON schemas.
 
     :param open_api: the base `OpenAPI` object
     :param schema_classes: Pydantic classes that their schema will be used
@@ -180,9 +181,9 @@ def construct_open_api_with_schema_class(
 
 
 def _validate_schemas(
-    schema_definitions: Dict[str, Any]
+    schema_definitions: Dict[str, Any],
 ) -> Dict[str, Union[Reference, Schema]]:
-    """Convert JSON Schema definitions to parsed OpenAPI objects"""
+    """Convert JSON Schema definitions to parsed OpenAPI objects."""
     # Note: if an error occurs in schema_validate(), it may indicate that
     # the generated JSON schemas are not compatible with the version
     # of OpenAPI this module depends on.
@@ -192,9 +193,8 @@ def _validate_schemas(
     }
 
 
-def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
-    """
-    This function traverses the `OpenAPI` object and
+def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:  # noqa: C901
+    """This function traverses the `OpenAPI` object and.
 
     1. Replaces the `PydanticSchema` object with `Reference` object, with correct ref
        value;
@@ -205,7 +205,6 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
     :param open_api: the `OpenAPI` object to be traversed and mutated
     :return: a list of schema classes extracted from `PydanticSchema` objects
     """
-
     pydantic_types: Set[Type[BaseModel]] = set()
 
     def _traverse(obj: Any) -> None:
@@ -243,8 +242,7 @@ def _handle_pydantic_schema(open_api: OpenAPI) -> List[Type[BaseModel]]:
 
 
 def _construct_ref_obj(pydantic_schema: PydanticSchema[PydanticType]) -> Reference:
-    """
-    Construct a reference object from the Pydantic schema name
+    """Construct a reference object from the Pydantic schema name.
 
     characters in the schema name that are invalid/problematic
     for JSONschema $ref names will get replaced with underscores.

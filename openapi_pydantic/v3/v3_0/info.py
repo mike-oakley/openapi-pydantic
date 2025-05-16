@@ -27,8 +27,8 @@ _examples = [
 
 
 class Info(BaseModel):
-    """
-    The object provides metadata about the API.
+    """The object provides metadata about the API.
+
     The metadata MAY be used by the clients if needed,
     and MAY be presented in editing or documentation generation tools for convenience.
     """
@@ -41,7 +41,7 @@ class Info(BaseModel):
     description: Optional[str] = None
     """
     A short description of the API.
-    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text 
+    [CommonMark syntax](https://spec.commonmark.org/) MAY be used for rich text
     representation.
     """
 
@@ -64,7 +64,7 @@ class Info(BaseModel):
     version: str
     """
     **REQUIRED**. The version of the OpenAPI document
-    (which is distinct from the [OpenAPI Specification version](#oasVersion) or the API 
+    (which is distinct from the [OpenAPI Specification version](#oasVersion) or the API
     implementation version).
     """
 

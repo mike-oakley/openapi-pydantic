@@ -251,21 +251,21 @@ def construct_base_open_api_4_generic_response(response_schema: type) -> OpenAPI
 
 
 class PingRequest(BaseModel):
-    """Ping Request"""
+    """Ping Request."""
 
     req_foo: str = Field(description="foo value of the request")
     req_bar: str = Field(description="bar value of the request")
 
 
 class PingResponse(BaseModel):
-    """Ping response"""
+    """Ping response."""
 
     resp_foo: str = Field(description="foo value of the response")
     resp_bar: str = Field(description="bar value of the response")
 
 
 class PongResponse(BaseModel):
-    """Pong response"""
+    """Pong response."""
 
     resp_foo: str = Field(alias="pong_foo", description="foo value of the response")
     resp_bar: str = Field(alias="pong_bar", description="bar value of the response")

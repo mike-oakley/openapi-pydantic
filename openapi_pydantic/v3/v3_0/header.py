@@ -11,9 +11,10 @@ _examples = [
 
 
 class Header(ParameterBase):
-    """
-    The Header Object follows the structure of the
-    [Parameter Object](#parameterObject) with the following changes:
+    """Header parameter object.
+
+    The Header Object follows the structure of the [Parameter Object](#parameterObject)
+    with the following changes:
 
     1. `name` MUST NOT be specified, it is given in the corresponding
         `headers` map.

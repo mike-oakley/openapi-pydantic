@@ -1,3 +1,5 @@
+"""OpenAPI V3 schema interface utilizing Pydantic."""
+
 from .parser import parse_obj as parse_obj
 from .v3_1 import XML as XML
 from .v3_1 import Callback as Callback

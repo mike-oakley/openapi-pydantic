@@ -63,8 +63,7 @@ def construct_base_open_api() -> OpenAPI:
 
 
 def test_pydantic_discriminator_schema_generation() -> None:
-    """https://github.com/kuimono/openapi-schema-pydantic/issues/8"""
-
+    """https://github.com/kuimono/openapi-schema-pydantic/issues/8."""
     a_kind: Dict[str, Union[str, List[str]]] = {"title": "Kind", "type": "string"}
     b_kind: Dict[str, Union[str, List[str]]] = {"title": "Kind", "type": "string"}
 
@@ -74,7 +73,8 @@ def test_pydantic_discriminator_schema_generation() -> None:
         a_kind["const"] = "a"
         b_kind["const"] = "b"
         if PYDANTIC_MINOR_VERSION < 10:
-            # Prior to 2.10, string literal types are also mapped to enums with a single entry.
+            # Prior to 2.10, string literal types are also mapped to enums with a
+            # single entry.
             a_kind["enum"] = ["a"]
             b_kind["enum"] = ["b"]
     else:
@@ -127,8 +127,7 @@ def test_pydantic_discriminator_schema_generation() -> None:
 
 
 def test_pydantic_discriminator_openapi_generation() -> None:
-    """https://github.com/kuimono/openapi-schema-pydantic/issues/8"""
-
+    """https://github.com/kuimono/openapi-schema-pydantic/issues/8."""
     open_api = construct_open_api_with_schema_class(construct_base_open_api())
     assert open_api.components is not None
     assert open_api.components.schemas is not None

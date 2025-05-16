@@ -16,7 +16,8 @@ _examples = [
 
 
 class Discriminator(BaseModel):
-    """
+    """Request or Response discriminator object.
+
     When request bodies or response payloads may be one of a number of different
     schemas, a `discriminator` object can be used to aid in serialization,
     deserialization, and validation.
@@ -30,7 +31,7 @@ class Discriminator(BaseModel):
 
     propertyName: str
     """
-    **REQUIRED**. The name of the property in the payload that will hold the 
+    **REQUIRED**. The name of the property in the payload that will hold the
     discriminator value.
     """
 

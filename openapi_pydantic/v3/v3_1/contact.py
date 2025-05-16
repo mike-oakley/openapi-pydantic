@@ -14,9 +14,7 @@ _examples = [
 
 
 class Contact(BaseModel):
-    """
-    Contact information for the exposed API.
-    """
+    """Contact information for the exposed API."""
 
     name: Optional[str] = None
     """

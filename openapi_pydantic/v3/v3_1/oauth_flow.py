@@ -33,9 +33,7 @@ _examples = [
 
 
 class OAuthFlow(BaseModel):
-    """
-    Configuration details for a supported OAuth Flow
-    """
+    """Configuration details for a supported OAuth Flow."""
 
     authorizationUrl: Optional[str] = None
     """

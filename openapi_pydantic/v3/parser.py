@@ -22,6 +22,7 @@ elif PYDANTIC_V2:
         root: OpenAPIv3 = Field(discriminator="openapi")
 
     def parse_obj(data: Any) -> OpenAPIv3:
+        """Parse a raw object into an OpenAPI model with version inference."""
         return _OpenAPI.model_validate(data).root
 
 else:
@@ -30,4 +31,5 @@ else:
         __root__: OpenAPIv3 = Field(discriminator="openapi")
 
     def parse_obj(data: Any) -> OpenAPIv3:
+        """Parse a raw object into an OpenAPI model with version inference."""
         return _OpenAPI.parse_obj(data).__root__
