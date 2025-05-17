@@ -1,25 +1,55 @@
-# openapi-pydantic
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mike-oakley/openapi-pydantic/main/docs/_static/logo.png" alt="openapi-pydantic logo" width="120" height="120">
+</p>
 
-[![PyPI](https://img.shields.io/pypi/v/openapi-pydantic)](https://pypi.org/project/openapi-pydantic/)
-[![PyPI - License](https://img.shields.io/pypi/l/openapi-pydantic)](https://github.com/mike-oakley/openapi-pydantic/blob/main/LICENSE)
+<h1 align="center">openapi-pydantic</h1>
 
-OpenAPI schema implemented in [Pydantic](https://github.com/samuelcolvin/pydantic). Both Pydantic 1.8+ and 2.x are supported.
+<p align="center">
+  <a href="https://pypi.org/project/openapi-pydantic/"><img src="https://img.shields.io/pypi/v/openapi-pydantic" alt="PyPI"></a>
+  <a href="https://github.com/mike-oakley/openapi-pydantic/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/openapi-pydantic" alt="License"></a>
+</p>
 
-The naming of the classes follows the schema in 
-[OpenAPI specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.1.md#schema).
+<p align="center">
+  <b>Modern, type-safe OpenAPI schemas in Python using Pydantic 1.8+ and 2.x</b>
+</p>
 
-> This library is forked from [OpenAPI Schema Pydantic](https://github.com/kuimono/openapi-schema-pydantic)  (at version [1.2.4](https://github.com/kuimono/openapi-schema-pydantic/releases/tag/v1.2.4)) which is no longer actively maintained.
+---
 
-## Installation
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage Examples](#usage-examples)
+- [Using Pydantic Classes as Schema](#using-pydantic-classes-as-schema)
+- [Notes](#notes)
+- [Credits](#credits)
+- [License](#license)
 
-`pip install openapi-pydantic`
+---
 
-## Try me
+## ✨ Features
+
+- Supports both Pydantic 1.8+ and 2.x
+- Supports the [OpenAPI 3.1 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.1.md#schema) (with [3.0]((https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.4.md#schema)) also available)
+- Easy construction of OpenAPI schemas using Python objects or dicts
+- Seamless integration with Pydantic models for request/response schemas
+- Utility functions for schema conversion and validation
+
+---
+
+## 📦 Installation
+
+```bash
+pip install openapi-pydantic
+```
+
+---
+
+## 🚀 Quick Start
 
 ```python
 from openapi_pydantic import OpenAPI, Info, PathItem, Operation, Response
 
-# Construct OpenAPI by pydantic objects
 open_api = OpenAPI(
     info=Info(
         title="My own API",
@@ -37,11 +67,12 @@ open_api = OpenAPI(
         )
     },
 )
-# Note: for Pydantic 1.x, replace `model_dump_json` with `json`
+# For Pydantic 1.x, use `json` instead of `model_dump_json`
 print(open_api.model_dump_json(by_alias=True, exclude_none=True, indent=2))
 ```
 
-Result:
+<details>
+<summary>Output</summary>
 
 ```json
 {
@@ -69,12 +100,13 @@ Result:
   }
 }
 ```
+</details>
 
-## Take advantage of Pydantic
+---
 
-Pydantic is a great tool. It allows you to use object / dict / mixed data for input.
+## 📝 Usage Examples
 
-The following examples give the same OpenAPI result as above:
+Pydantic allows you to use object, dict, or mixed data for input. The following examples all produce the same OpenAPI result as above:
 
 ```python
 from openapi_pydantic import parse_obj, OpenAPI, PathItem, Response
@@ -90,9 +122,8 @@ open_api = parse_obj({
     },
 })
 
-
 # Construct OpenAPI v3.1 schema from dict
-# Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
+# For Pydantic 1.x, use `parse_obj` instead of `model_validate`
 open_api = OpenAPI.model_validate({
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {
@@ -103,7 +134,6 @@ open_api = OpenAPI.model_validate({
 })
 
 # Construct OpenAPI with mix of dict/object
-# Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
 open_api = OpenAPI.model_validate({
     "info": {"title": "My own API", "version": "v0.0.1"},
     "paths": {
@@ -114,26 +144,19 @@ open_api = OpenAPI.model_validate({
 })
 ```
 
-## Use Pydantic classes as schema
+---
 
-- The [Schema Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.4.md#schemaObject)
-  in OpenAPI has definitions and tweaks in JSON Schema, which are hard to comprehend and define a good data class
-- Pydantic already has a good way to [create JSON schema](https://pydantic-docs.helpmanual.io/usage/schema/).
-  Let's not reinvent the wheel.
+## 🧑‍💻 Using Pydantic Classes as Schema
 
-The approach to deal with this:
-
-1. Use `PydanticSchema` objects to represent the `Schema` in `OpenAPI` object
-2. Invoke `construct_open_api_with_schema_class` to resolve the JSON schemas and references
+> 💡 **Tip:** Use your own Pydantic models for request/response schemas and let openapi-pydantic handle the conversion!
 
 ```python
 from pydantic import BaseModel, Field
-
 from openapi_pydantic import OpenAPI
 from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
 
 def construct_base_open_api() -> OpenAPI:
-    # Note: for Pydantic 1.x, replace `model_validate` with `parse_obj`
+    # For Pydantic 1.x, use `parse_obj` instead of `model_validate`
     return OpenAPI.model_validate({
         "info": {"title": "My own API", "version": "v0.0.1"},
         "paths": {
@@ -167,11 +190,12 @@ open_api = construct_base_open_api()
 open_api = construct_open_api_with_schema_class(open_api)
 
 # print the result openapi.json
-# Note: for Pydantic 1.x, replace `model_dump_json` with `json`
+# For Pydantic 1.x, use `json` instead of `model_dump_json`
 print(open_api.model_dump_json(by_alias=True, exclude_none=True, indent=2))
 ```
 
-Result:
+<details>
+<summary>Output</summary>
 
 ```json
 {
@@ -262,14 +286,15 @@ Result:
   }
 }
 ```
+</details>
+
+---
 
 ## Notes
 
 ### Use of OpenAPI.model_dump() / OpenAPI.model_dump_json() / OpenAPI.json() / OpenAPI.dict()
 
-When using `OpenAPI.model_dump()` / `OpenAPI.model_dump_json()` / `OpenAPI.json()` / `OpenAPI.dict()` functions,
-the arguments `by_alias=True, exclude_none=True` have to be in place.
-Otherwise the resulting json will not fit the OpenAPI standard.
+> ⚠️ **Important:** Always use `by_alias=True, exclude_none=True` when dumping models to JSON or dict, to ensure OpenAPI compatibility.
 
 ```python
 # OK (Pydantic 2)
@@ -292,7 +317,7 @@ More info about field aliases:
 ### Non-pydantic schema types
 
 Some schema types are not implemented as pydantic classes.
-Please refer to the following for more info:
+See:
 
 | OpenAPI version | Non-pydantic schema type info |
 | --------------- | ----------------------------- |
@@ -301,8 +326,7 @@ Please refer to the following for more info:
 
 ### Use OpenAPI 3.0 instead of 3.1
 
-Some UI renderings (e.g. Swagger) still do not support OpenAPI 3.1.x.
-The old 3.0.x version is available by importing from different paths:
+> ℹ️ Some UI renderings (e.g. Swagger) do not support OpenAPI 3.1.x. You can use 3.0.x by importing from different paths:
 
 ```python
 from openapi_pydantic.v3.v3_0 import OpenAPI, ...
@@ -311,12 +335,16 @@ from openapi_pydantic.v3.v3_0.util import PydanticSchema, construct_open_api_wit
 
 ### Pydantic version compatibility
 
-Compatibility with both major versions of Pydantic (1.8+ and 2.*) is mostly achieved using a module called `compat.py`. It detects the installed version of Pydantic and exports version-specific symbols for use by the rest of the package. It also provides all symbols necessary for type checking. The `compat.py` module is not intended to be imported by other packages, but other packages may find it helpful as an example of how to span major versions of Pydantic.
+Compatibility with both major versions of Pydantic (1.8+ and 2.*) is achieved using a module called `compat.py`. It detects the installed version and exports version-specific symbols for use by the rest of the package. The `compat.py` module is not intended to be imported by other packages, but may serve as an example for supporting multiple Pydantic versions.
 
-## Credits
+---
 
-This library is based from the original implementation by Kuimono of [OpenAPI Schema Pydantic](https://github.com/kuimono/openapi-schema-pydantic) which is no longer actively maintained.
+## 🙏 Credits
 
-## License
+This library is based on the original implementation by Kuimono of [OpenAPI Schema Pydantic](https://github.com/kuimono/openapi-schema-pydantic), which is no longer actively maintained.
+
+---
+
+## 📄 License
 
 [MIT License](https://github.com/mike-oakley/openapi-pydantic/blob/main/LICENSE)
