@@ -20,7 +20,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: "$UV_VERSION"
+          version: "${{ env.UV_VERSION }}"
           enable-cache: true
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -46,7 +46,7 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v5
       with:
-        version: "$UV_VERSION"
+        version: "${{ env.UV_VERSION }}"
         enable-cache: true
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -85,7 +85,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: "$UV_VERSION"
+          version: "${{ env.UV_VERSION }}"
           enable-cache: true
       - name: Install Dependencies
         run: uv pip install coverage
