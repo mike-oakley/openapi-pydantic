@@ -30,13 +30,11 @@ _examples = [
         "content": {"text/plain": {"schema": {"type": "string", "example": "whoa!"}}},
         "headers": {
             "X-Rate-Limit-Limit": {
-                "description": "The number of allowed requests in the "
-                "current period",
+                "description": "The number of allowed requests in the current period",
                 "schema": {"type": "integer"},
             },
             "X-Rate-Limit-Remaining": {
-                "description": "The number of remaining requests in the "
-                "current period",
+                "description": "The number of remaining requests in the current period",
                 "schema": {"type": "integer"},
             },
             "X-Rate-Limit-Reset": {
