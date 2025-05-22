@@ -30,9 +30,9 @@ jobs:
         run: uv sync --locked --all-extras --group dev
       - name: Lint
         run: 
-          mypy openapi_pydantic tests
-          ruff check openapi_pydantic tests
-          ruff format openapi_pydantic tests --check 
+          uv run mypy openapi_pydantic tests
+          uv run ruff check openapi_pydantic tests
+          uv run ruff format openapi_pydantic tests --check
 
   test:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
       run: uv pip install --upgrade "pydantic>=2.0.2,<3.0.0"
     - run: mkdir coverage
     - name: Test
-      run: coverage run -m pytest tests
+      run: uv run coverage run -m pytest tests
       env:
         COVERAGE_FILE: coverage/.coverage.${{ runner.os }}-py${{ matrix.python-version }}
         CONTEXT: ${{ runner.os }}-py${{ matrix.python-version }}
@@ -88,7 +88,7 @@ jobs:
           version: "${{ env.UV_VERSION }}"
           enable-cache: true
       - name: Install Dependencies
-        run: uv pip install coverage
+        run: uv sync --locked --all-extras --group test
       - name: Get coverage files
         uses: actions/download-artifact@v4
         with:
@@ -96,9 +96,9 @@ jobs:
           path: coverage
           merge-multiple: true
       - run: ls -la coverage
-      - run: coverage combine coverage
-      - run: coverage report
-      - run: coverage html --title "Coverage for ${{ github.sha }}"
+      - run: uv run coverage combine coverage
+      - run: uv run coverage report
+      - run: uv run coverage html --title "Coverage for ${{ github.sha }}"
       - name: Store coverage HTML
         uses: actions/upload-artifact@v4
         with:
