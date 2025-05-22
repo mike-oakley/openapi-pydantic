@@ -16,14 +16,14 @@ time by ensuring that your changes will be accepted with fewer revisions down th
 
 ### Local Development
 
-A [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configuration is provided in the repo to get your environment setup automatically. Alternatively you can install [tox](https://tox.wiki/en/latest/) and [poetry](https://python-poetry.org/) manually.
+A [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configuration is provided in the repo to get your environment setup automatically.
+
+If devcontainers aren't your speed, you can manually setup your environment by installing `uv` and
+then running `uv sync --all-groups`.
 
 ### Testing
 
-Please ensure all changes have good test coverage and are formatted correctly. You can run the test
-suite and linters using [tox](https://tox.wiki/en/latest/) - just run `tox` from the root of this
-repo to run the checks. These will also be run automatically in CI once your PR is opened. Don't
-worry about testing against every Python version - the CI action will do this for you!
+Please ensure all changes have good test coverage. We use [pytest](https://docs.pytest.org/en/latest/) for testing, and [coverage](https://coverage.readthedocs.io/en/latest/) for measuring code coverage.
 
 ### Tagging
 

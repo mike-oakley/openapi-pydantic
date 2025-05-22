@@ -13,17 +13,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.5"
+          enable-cache: true
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.12
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: false
-          version: 1.8.3
       - name: Build package distribution
-        run: poetry build
+        run: uv build
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
         with:
@@ -38,7 +38,7 @@ jobs:
       name: test
       url: https://test.pypi.org/p/openapi-pydantic
     permissions:
-      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
     steps:
     - name: Download package distribution
       uses: actions/download-artifact@v4
@@ -58,7 +58,7 @@ jobs:
       name: production
       url: https://pypi.org/p/openapi-pydantic
     permissions:
-      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
     steps:
     - name: Download package distribution
       uses: actions/download-artifact@v4
