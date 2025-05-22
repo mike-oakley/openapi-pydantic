@@ -41,7 +41,7 @@ Issues = "https://github.com/mike-oakley/openapi-pydantic/issues"
 Changelog = "https://github.com/mike-oakley/openapi-pydantic/releases"
 
 [dependency-groups]
-test = ["pytest>=8.2.2", "coverage>=7.8.1", "openapi-spec-validator>=0.7.0"]
+test = ["pytest>=8.2.2", "coverage>=6.5.0", "openapi-spec-validator>=0.7.0"]
 dev = ["mypy>=1.8.0", "ruff>=0.7.2"]
 
 [build-system]
