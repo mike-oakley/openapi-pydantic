@@ -15,6 +15,11 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        linter:
+          - mypy
+          - ruff
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
@@ -28,11 +33,15 @@ jobs:
           python-version: '3.12'
       - name: Install the project
         run: uv sync --locked --all-extras --group dev
-      - name: Lint
-        run: 
-          uv run mypy openapi_pydantic tests
-          uv run ruff check openapi_pydantic tests
-          uv run ruff format openapi_pydantic tests --check
+      - name: Run ruff lint check
+        if: matrix.linter == 'ruff'
+        run: uv run ruff check openapi_pydantic tests
+      - name: Run ruff format check
+        if: matrix.linter == 'ruff'
+        run: uv run ruff format --check openapi_pydantic tests
+      - name: Run Mypy Check
+        if: matrix.linter == 'mypy'
+        run: uv run mypy openapi_pydantic tests
 
   test:
     runs-on: ubuntu-latest
