@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: 3.12
       - name: Set uv project environment
-        run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python.outputs.python-path }}" >> $GITHUB_ENV
+        run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python.outputs.python-path }}../../" >> $GITHUB_ENV
       - name: Build package distribution
         run: uv build
       - name: Upload package artifact
