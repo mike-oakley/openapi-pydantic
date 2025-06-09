@@ -10,6 +10,9 @@ permissions:
 
 env:
   UV_SYSTEM_PYTHON: 1
+  UV_PROJECT_ENVIRONMENT: /usr/local/
+  UV_VERSION: 0.7.5
+
 
 jobs:
   smokeshow:
@@ -28,7 +31,7 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v6
         with:
-          version: "0.7.5"
+          version: "${{ env.UV_VERSION }}"
           enable-cache: true
       - run: uv pip install -r requirements-github-actions.txt
       - uses: actions/download-artifact@v4
