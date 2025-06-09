@@ -13,7 +13,6 @@ on:
 
 env:
   UV_SYSTEM_PYTHON: 1
-  UV_PROJECT_ENVIRONMENT: /opt/hostedtoolcache/Python
   UV_VERSION: 0.7.5
 
 jobs:
@@ -32,9 +31,12 @@ jobs:
           version: "${{ env.UV_VERSION }}"
           enable-cache: true
       - name: Set up Python 3.12
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Set uv project environment
+        run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python.outputs.python-location }}" >> $GITHUB_ENV
       - name: Install the project
         run: uv sync --locked --all-extras --all-groups
       - name: Run ruff lint check

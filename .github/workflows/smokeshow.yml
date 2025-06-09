@@ -10,7 +10,6 @@ permissions:
 
 env:
   UV_SYSTEM_PYTHON: 1
-  UV_PROJECT_ENVIRONMENT: /opt/hostedtoolcache/Python
   UV_VERSION: 0.7.5
 
 
@@ -26,8 +25,11 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
+        id: setup-python
         with:
           python-version: '3.12'
+      - name: Set uv project environment
+        run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python.outputs.python-location }}" >> $GITHUB_ENV
       - name: Setup uv
         uses: astral-sh/setup-uv@v6
         with:
