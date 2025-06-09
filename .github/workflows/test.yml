@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Set uv project environment
-        run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python-lint.outputs.python-location }}" >> $GITHUB_ENV
+        run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python-lint.outputs.python-path }}" >> $GITHUB_ENV
       - name: Install the project
         run: uv sync --locked --all-extras --all-groups
       - name: Run ruff lint check
@@ -71,7 +71,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Set uv project environment
-      run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python-test.outputs.python-location }}" >> $GITHUB_ENV
+      run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python-test.outputs.python-path }}" >> $GITHUB_ENV
     - name: Install the project
       run: uv sync --locked --all-extras --group test
     - name: Install Pydantic v1
@@ -111,7 +111,7 @@ jobs:
           version: "${{ env.UV_VERSION }}"
           enable-cache: true
       - name: Set uv project environment
-        run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python-coverage.outputs.python-location }}" >> $GITHUB_ENV
+        run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python-coverage.outputs.python-path }}" >> $GITHUB_ENV
       - name: Install Dependencies
         run: uv sync --locked --all-extras --group test
       - name: Get coverage files
