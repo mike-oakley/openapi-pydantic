@@ -10,7 +10,7 @@ permissions:
 
 env:
   UV_SYSTEM_PYTHON: 1
-  UV_PROJECT_ENVIRONMENT: /usr/local/
+  UV_PROJECT_ENVIRONMENT: /opt/hostedtoolcache/Python
   UV_VERSION: 0.7.5
 
 
