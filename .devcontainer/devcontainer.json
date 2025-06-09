@@ -1,21 +1,32 @@
 {
 	"name": "openapi-pydantic",
 	"image": "mcr.microsoft.com/devcontainers/python:0-3.11",
+	"mounts": [
+		"source=${devcontainerId}-cache,target=${containerWorkspaceFolder}/.cache,type=volume",
+		"source=${devcontainerId}-venv,target=${containerWorkspaceFolder}/.venv,type=volume"
+	],
+	"onCreateCommand": "sudo chown vscode .cache && sudo chown vscode .venv",
 	"features": {
-		"ghcr.io/devcontainers-contrib/features/poetry:2": {
-			"version": "latest"
+		"ghcr.io/va-h/devcontainers-features/uv:1": {
+			"version": "latest",
+			"shellautocompletion": true
 		}
 	},
 	"containerEnv": {
-		"POETRY_VIRTUALENVS_IN_PROJECT": "true"
+		"XDG_CACHE_DIR": ".cache",
+		"UV_CACHE_DIR": ".cache/.uv-cache",
+		"UV_LINK_MODE": "symlink",
+		"RUFF_CACHE_DIR": ".cache/.ruff-cache",
+		"MYPY_CACHE_DIR": ".cache/.mypy-cache"
 	},
-	"postCreateCommand": "poetry install && pip install --upgrade tox",
+	"updateContentCommand": "uv sync --all-groups",
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"ms-python.python",
 				"ms-python.vscode-pylance",
-				"charliermarsh.ruff"
+				"charliermarsh.ruff",
+				"github.vscode-github-actions"
 			]
 		}
 	}

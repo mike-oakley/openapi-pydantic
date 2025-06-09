@@ -1,46 +1,52 @@
-[tool.poetry]
+[project]
 name = "openapi-pydantic"
 version = "0.5.1"
-description = "Pydantic OpenAPI schema implementation"
-authors = ["Mike Oakley <mike-oakley@users.noreply.github.com>"]
-readme = "README.md"
-repository = "https://github.com/mike-oakley/openapi-pydantic"
-license = "MIT"
-keywords = [
-  "openapi",
-  "schema",
-  "parser",
-  "pydantic",
-  "validation",
+description = "Modern, type-safe OpenAPI schemas in Python using Pydantic 1.8+ and 2.x"
+authors = [
+  { name = "Mike Oakley", email = "mike-oakley@users.noreply.github.com" },
 ]
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+keywords = ["openapi", "schema", "parser", "pydantic", "validation"]
 classifiers = [
-  "Programming Language :: Python :: 3",
+  "Framework :: Pydantic :: 1",
+  "Framework :: Pydantic :: 2",
+  "Framework :: Pydantic",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
-  "Framework :: Pydantic",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development",
+  "Typing :: Typed",
 ]
-include = ["openapi_pydantic/py.typed"]
+dependencies = ["pydantic>=1.8"]
 
-[tool.poetry.urls]
-changelog = "https://github.com/mike-oakley/openapi-pydantic/releases"
+[project.urls]
+Homepage = "https://github.com/mike-oakley/openapi-pydantic"
+Repository = "https://github.com/mike-oakley/openapi-pydantic"
+Issues = "https://github.com/mike-oakley/openapi-pydantic/issues"
+Changelog = "https://github.com/mike-oakley/openapi-pydantic/releases"
 
-[tool.poetry.dependencies]
-python = "^3.8"
-pydantic = ">=1.8"
-
-[tool.poetry.group.test.dependencies]
-pytest = "^8.2.2"
-pytest-cov = "^5.0.0"
-openapi-spec-validator = "^0.7.0"
-
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.8.0"
-pre-commit = "^2.16.0"
-ruff = "^0.7.2"
+[dependency-groups]
+test = ["pytest>=8.2.2", "coverage>=6.5.0", "openapi-spec-validator>=0.7.0"]
+dev = ["mypy>=1.8.0", "ruff>=0.7.2"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
 
 [tool.mypy]
 warn_unused_ignores = true
@@ -62,41 +68,41 @@ include = ["openapi_pydantic/**/*.py", "tests/**/*.py"]
 
 [tool.ruff.lint]
 select = [
-    # https://docs.astral.sh/ruff/rules/#pydocstyle-d
-    "D",
-    # https://docs.astral.sh/ruff/rules/#error-e
-    "E",
-    # https://docs.astral.sh/ruff/rules/#pyflakes-f
-    "F",
-    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-    "B",
-    # https://docs.astral.sh/ruff/rules/#isort-i
-    "I",
-    # https://docs.astral.sh/ruff/rules/complex-structure/
-    "C901",
-    # https://docs.astral.sh/ruff/rules/#warning-w
-    "W",
+  # https://docs.astral.sh/ruff/rules/#pydocstyle-d
+  "D",
+  # https://docs.astral.sh/ruff/rules/#error-e
+  "E",
+  # https://docs.astral.sh/ruff/rules/#pyflakes-f
+  "F",
+  # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B",
+  # https://docs.astral.sh/ruff/rules/#isort-i
+  "I",
+  # https://docs.astral.sh/ruff/rules/complex-structure/
+  "C901",
+  # https://docs.astral.sh/ruff/rules/#warning-w
+  "W",
 ]
 
 ignore = [
-    # Lint rules which are recommended to be disabled when using the ruff formatter.
-    # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
-    "W191",
-    "E111",
-    "E114",
-    "E117",
-    "D100",
-    "D106",
-    "D206",
-    "D300",
-    "Q000",
-    "Q001",
-    "Q002",
-    "Q003",
-    "COM812",
-    "COM819",
-    "ISC001",
-    "ISC002",
+  # Lint rules which are recommended to be disabled when using the ruff formatter.
+  # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+  "W191",
+  "E111",
+  "E114",
+  "E117",
+  "D100",
+  "D106",
+  "D206",
+  "D300",
+  "Q000",
+  "Q001",
+  "Q002",
+  "Q003",
+  "COM812",
+  "COM819",
+  "ISC001",
+  "ISC002",
 ]
 
 [tool.ruff.lint.isort]
@@ -114,3 +120,6 @@ quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
 skip-magic-trailing-comma = false
+
+[tool.pytest.ini_options]
+cache_dir = "${XDG_CACHE_DIR}/.pytest_cache"

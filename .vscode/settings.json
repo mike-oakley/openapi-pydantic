@@ -11,5 +11,8 @@
         "source.fixAll": "explicit",
         "source.organizeImports": "explicit"
     },
-    "editor.defaultFormatter": "charliermarsh.ruff"
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "[toml]": {
+        "editor.defaultFormatter": "tamasfe.even-better-toml"
+    }
 }

@@ -14,8 +14,7 @@ _examples = [
         "contentType": "image/png, image/jpeg",
         "headers": {
             "X-Rate-Limit-Limit": {
-                "description": "The number of allowed requests in the "
-                "current period",
+                "description": "The number of allowed requests in the current period",
                 "schema": {"type": "integer"},
             }
         },

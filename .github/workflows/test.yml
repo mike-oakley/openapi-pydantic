@@ -1,5 +1,8 @@
 name: Test
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -7,27 +10,113 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+
+env:
+  UV_VERSION: 0.7.5
+
 jobs:
-  tox:
+  lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        linter:
+          - mypy
+          - ruff
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "${{ env.UV_VERSION }}"
+          enable-cache: true
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install the project
+        run: uv sync --locked --all-extras --all-groups
+      - name: Run ruff lint check
+        if: matrix.linter == 'ruff'
+        run: uv run ruff check openapi_pydantic tests
+      - name: Run ruff format check
+        if: matrix.linter == 'ruff'
+        run: uv run ruff format --check openapi_pydantic tests
+      - name: Run Mypy Check
+        if: matrix.linter == 'mypy'
+        run: uv run mypy openapi_pydantic tests
+
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        pydantic-version: ['pydantic-v1', 'pydantic-v2']
+      fail-fast: false
     steps:
     - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: "${{ env.UV_VERSION }}"
+        enable-cache: true
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install tox tox-gh-actions
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
+    - name: Install the project
+      run: uv sync --locked --all-extras --group test
+    - name: Install Pydantic v1
+      if: matrix.pydantic-version == 'pydantic-v1'
+      run: uv add "pydantic>=1.10.0,<2.0.0" --upgrade-package pydantic
+    - name: Install Pydantic v2
+      if: matrix.pydantic-version == 'pydantic-v2'
+      run: uv add "pydantic>=2.0.2,<3.0.0" --upgrade-package pydantic
+    - run: mkdir coverage
+    - name: Test
+      run: uv run coverage run -m pytest -vv tests
+      env:
+        COVERAGE_FILE: coverage/.coverage.${{ runner.os }}-py${{ matrix.python-version }}
+        CONTEXT: ${{ runner.os }}-py${{ matrix.python-version }}
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
       with:
-        version: 1.8.3
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-    - name: Run tox test suite
-      run: tox
+        name: coverage-${{ matrix.python-version }}-${{ matrix.pydantic-version }}
+        path: coverage
+        include-hidden-files: true
+       
+
+  coverage:
+    needs: [test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "${{ env.UV_VERSION }}"
+          enable-cache: true
+      - name: Install Dependencies
+        run: uv sync --locked --all-extras --group test
+      - name: Get coverage files
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: coverage
+          merge-multiple: true
+      - run: ls -la coverage
+      - run: uv run coverage combine coverage
+      - run: uv run coverage report
+      - run: uv run coverage html --title "Coverage for ${{ github.sha }}"
+      - name: Store coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov
+          include-hidden-files: true
