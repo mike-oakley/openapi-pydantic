@@ -5,8 +5,19 @@
 <h1 align="center">openapi-pydantic</h1>
 
 <p align="center">
-  <a href="https://pypi.org/project/openapi-pydantic/"><img src="https://img.shields.io/pypi/v/openapi-pydantic" alt="PyPI"></a>
-  <a href="https://github.com/mike-oakley/openapi-pydantic/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/openapi-pydantic" alt="License"></a>
+  <a href="https://github.com/mike-oakley/openapi-pydantic/actions?query=workflow%3ATest+event%3Apush+branch%3Amain" target="_blank">
+      <img src="https://github.com/mike-oakley/openapi-pydantic/actions/workflows/test.yml/badge.svg?event=push&branch=main" alt="Test">
+  </a>
+  <a href="https://coverage-badge.samuelcolvin.workers.dev/redirect/mike-oakley/openapi-pydantic" target="_blank">
+      <img src="https://coverage-badge.samuelcolvin.workers.dev/mike-oakley/openapi-pydantic.svg" alt="Coverage">
+  </a>
+  <a href="https://pypi.org/project/openapi-pydantic" target="_blank">
+      <img src="https://img.shields.io/pypi/v/openapi-pydantic?color=%2334D058&label=pypi%20package" alt="Package version">
+  </a>
+  <a href="https://pypi.org/project/openapi-pydantic" target="_blank">
+      <img src="https://img.shields.io/pypi/pyversions/openapi-pydantic.svg?color=%2334D058" alt="Supported Python versions">
+  </a>
+  <a href="https://github.com/mike-oakley/openapi-pydantic/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/openapi-pydantic?color=%2334D058" alt="License"></a>
 </p>
 
 <p align="center">
