@@ -9,8 +9,8 @@ permissions:
   statuses: write
 
 env:
-  UV_SYSTEM_PYTHON: 1
   UV_VERSION: 0.7.5
+  SMOKESHOW_VERSION: 0.5.0
 
 
 jobs:
@@ -28,14 +28,11 @@ jobs:
         id: setup-python
         with:
           python-version: '3.12'
-      - name: Set uv project environment
-        run: echo "UV_PROJECT_ENVIRONMENT=${{ steps.setup-python.outputs.python-path }}../../" >> $GITHUB_ENV
       - name: Setup uv
         uses: astral-sh/setup-uv@v6
         with:
           version: "${{ env.UV_VERSION }}"
           enable-cache: true
-      - run: uv pip install -r requirements-github-actions.txt
       - uses: actions/download-artifact@v4
         with:
           name: coverage-html
@@ -46,7 +43,7 @@ jobs:
       - name: Upload coverage to Smokeshow
         run: |
           for i in 1 2 3 4 5; do
-            if smokeshow upload htmlcov; then
+            if uv tool run smokeshow@${{ env.SMOKESHOW_VERSION }} upload htmlcov; then
                 echo "Smokeshow upload success!"
                 break
             fi
