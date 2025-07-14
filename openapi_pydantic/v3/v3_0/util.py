@@ -149,7 +149,7 @@ def construct_open_api_with_schema_class(
     if not schema_classes:
         return open_api
 
-    schema_classes.sort(key=lambda x: x.__name__)
+    schema_classes.sort(key=lambda x: x.__qualname__)
     logger.debug("schema_classes: %s", schema_classes)
 
     # update new_open_api with new #/components/schemas
@@ -248,11 +248,19 @@ def _construct_ref_obj(pydantic_schema: PydanticSchema[PydanticType]) -> Referen
     for JSONschema $ref names will get replaced with underscores.
     Especially needed for Pydantic generic Models with brackets "[]"
 
+    For nested classes where the qualified name is not the same as the name of the
+    class, we need to prepend the module name in front of the qualified name. Otherwise,
+    just use the regular name of the class.
+
     see: https://github.com/pydantic/pydantic/blob/aee6057378ccfec02126bf9c984a9b6d6b411777/pydantic/json_schema.py#L2031
     """
-    ref_name = re.sub(
-        r"[^a-zA-Z0-9.\-_]", "_", pydantic_schema.schema_class.__name__
-    ).replace(".", "__")
+    module = pydantic_schema.schema_class.__module__
+    name = pydantic_schema.schema_class.__name__
+    qual_name = pydantic_schema.schema_class.__qualname__
+    specify_qualified_name = qual_name != name
+    schema_name = f"{module}.{qual_name}" if specify_qualified_name else name
+
+    ref_name = re.sub(r"[^a-zA-Z0-9.\-_]", "_", schema_name).replace(".", "__")
     ref_obj = Reference(**{"$ref": ref_prefix + ref_name})
     logger.debug(f"ref_obj={ref_obj}")
     return ref_obj
