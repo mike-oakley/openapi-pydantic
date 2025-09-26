@@ -51,8 +51,11 @@ jobs:
       contents: write
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
         pydantic-version: ['pydantic-v1', 'pydantic-v2']
+        exclude:  # Pydantic v1 is not supported on Python >= 3.14
+          - python-version: '3.14'
+            pydantic-version: 'pydantic-v1'
       fail-fast: false
     steps:
     - uses: actions/checkout@v5
@@ -65,14 +68,18 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: Install the project
       run: uv sync --locked --all-extras --group test
     - name: Install Pydantic v1
       if: matrix.pydantic-version == 'pydantic-v1'
       run: uv add "pydantic>=1.10.0,<2.0.0" --upgrade-package pydantic
-    - name: Install Pydantic v2
-      if: matrix.pydantic-version == 'pydantic-v2'
+    - name: Install Pydantic v2 on Python != 3.14
+      if: matrix.pydantic-version == 'pydantic-v2' && matrix.python-version != '3.14'
       run: uv add "pydantic>=2.0.2,<3.0.0" --upgrade-package pydantic
+    - name: Install Pydantic v2 on Python == 3.14
+      if: matrix.pydantic-version == 'pydantic-v2' && matrix.python-version == '3.14'
+      run: uv add "pydantic>=2.12.0a1" --upgrade-package pydantic
     - run: mkdir coverage
     - name: Test
       run: uv run coverage run -m pytest -vv tests
