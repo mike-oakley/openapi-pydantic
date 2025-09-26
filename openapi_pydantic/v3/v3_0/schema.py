@@ -132,7 +132,7 @@ class Schema(BaseModel):
 
     The title can be used to decorate a user interface with
     information about the data produced by this user interface.
-    The title will preferrably be short.
+    The title will preferably be short.
     """
 
     multipleOf: Optional[float] = Field(default=None, gt=0.0)
