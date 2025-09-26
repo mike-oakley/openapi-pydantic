@@ -26,7 +26,7 @@ the following fields are used with [alias](https://pydantic-docs.helpmanual.io/u
 
 ## Non-pydantic schema types
 
-Due to the constriants of python typing structure (not able to handle dynamic field names),
+Due to the constraints of python typing structure (not able to handle dynamic field names),
 the following schema classes are actually just a typing of `Dict`:
 
 | Schema Type | Implementation |
