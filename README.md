@@ -27,14 +27,19 @@
 ---
 
 ## Table of Contents
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Usage Examples](#usage-examples)
-- [Using Pydantic Classes as Schema](#using-pydantic-classes-as-schema)
+- [Table of Contents](#table-of-contents)
+- [✨ Features](#-features)
+- [📦 Installation](#-installation)
+- [🚀 Quick Start](#-quick-start)
+- [📝 Usage Examples](#-usage-examples)
+- [🧑‍💻 Using Pydantic Classes as Schema](#-using-pydantic-classes-as-schema)
 - [Notes](#notes)
-- [Credits](#credits)
-- [License](#license)
+  - [Use of OpenAPI.model\_dump() / OpenAPI.model\_dump\_json() / OpenAPI.json() / OpenAPI.dict()](#use-of-openapimodel_dump--openapimodel_dump_json--openapijson--openapidict)
+  - [Non-pydantic schema types](#non-pydantic-schema-types)
+  - [Use OpenAPI 3.0 instead of 3.1](#use-openapi-30-instead-of-31)
+  - [Pydantic version compatibility](#pydantic-version-compatibility)
+- [🙏 Credits](#-credits)
+- [📄 License](#-license)
 
 ---
 
