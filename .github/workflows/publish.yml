@@ -28,7 +28,7 @@ jobs:
       - name: Build package distribution
         run: uv build
       - name: Upload package artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: distribution
           path: dist
@@ -44,7 +44,7 @@ jobs:
       id-token: write
     steps:
     - name: Download package distribution
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: distribution
         path: dist
@@ -64,7 +64,7 @@ jobs:
       id-token: write
     steps:
     - name: Download package distribution
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: distribution
         path: dist
