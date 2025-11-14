@@ -1,5 +1,5 @@
 import logging
-from typing import Callable, Generic, TypeVar
+from typing import Callable, Generic, Literal, TypeVar
 
 import pytest
 from pydantic import BaseModel, Field
@@ -13,6 +13,7 @@ from openapi_pydantic import (
     Reference,
     RequestBody,
     Response,
+    Schema,
 )
 from openapi_pydantic.compat import PYDANTIC_V2
 from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
@@ -248,6 +249,164 @@ def construct_base_open_api_4_generic_response(response_schema: type) -> OpenAPI
             )
         },
     )
+
+
+@pytest.mark.parametrize(
+    "config_name", ("json_schema_mode", "json_schema_mode_override")
+)
+@pytest.mark.skipif(not PYDANTIC_V2, reason="computed fields require Pydantic V2")
+def test_construct_open_api_with_schema_class_json_schema_mode(
+    config_name: Literal["json_schema_mode", "json_schema_mode_override"],
+) -> None:
+    from typing import Optional
+
+    from pydantic import BaseModel, ConfigDict, computed_field
+
+    class SampleBase(BaseModel):
+        req: bool
+        opt: Optional[bool] = None
+
+        @computed_field  # type: ignore[prop-decorator]
+        @property
+        def comp(self) -> bool:
+            return True
+
+    class SampleValidation(SampleBase):
+        # json_schema_mode is a custom property, so mypy cannot verify its presence
+        model_config = ConfigDict(**{config_name: "validation"})  # type: ignore[misc]
+
+    class SampleSerialization(SampleBase):
+        model_config = ConfigDict(**{config_name: "serialization"})  # type: ignore[misc]
+
+    api_obj = OpenAPI(
+        info=Info(title="Sample API", version="v0.0.1"),
+        paths={
+            "/mode": PathItem(
+                post=Operation(
+                    requestBody=RequestBody(
+                        content={
+                            "application/json": MediaType(
+                                schema=PydanticSchema(schema_class=SampleValidation)
+                            )
+                        }
+                    ),
+                    responses={
+                        "200": Response(
+                            description="resp",
+                            content={
+                                "application/json": MediaType(
+                                    schema=PydanticSchema(
+                                        schema_class=SampleSerialization
+                                    )
+                                )
+                            },
+                        )
+                    },
+                )
+            )
+        },
+    )
+
+    result = construct_open_api_with_schema_class(api_obj)
+    assert result.components is not None
+    assert result.components.schemas is not None
+
+    validation_schema = result.components.schemas["SampleValidation"]
+    serialization_schema = result.components.schemas["SampleSerialization"]
+    assert isinstance(validation_schema, Schema)
+    assert isinstance(serialization_schema, Schema)
+
+    assert validation_schema.properties is not None
+    assert serialization_schema.properties is not None
+
+    # validation mode: computed field excluded
+    assert "comp" not in validation_schema.properties
+    assert validation_schema.required is not None
+    assert set(validation_schema.required) == {"req"}
+
+    # serialization mode: computed field included and required
+    assert "comp" in serialization_schema.properties
+    assert serialization_schema.required is not None
+    assert set(serialization_schema.required) == {"req", "comp"}
+
+
+@pytest.mark.skipif(not PYDANTIC_V2, reason="requires Pydantic V2 for union_format")
+def test_construct_open_api_with_schema_class_union_format_any_of() -> None:
+    from typing import Optional
+
+    class ModelAnyOf(BaseModel):
+        maybe: Optional[int] = None
+
+    api_obj = OpenAPI(
+        info=Info(title="Union API", version="v0.0.1"),
+        paths={
+            "/union": PathItem(
+                post=Operation(
+                    requestBody=RequestBody(
+                        content={
+                            "application/json": MediaType(
+                                schema=PydanticSchema(schema_class=ModelAnyOf)
+                            )
+                        }
+                    ),
+                    responses={"200": Response(description="ok")},
+                )
+            )
+        },
+    )
+    result = construct_open_api_with_schema_class(api_obj, union_format="any_of")
+    assert result.components is not None
+    assert result.components.schemas is not None
+    schema_obj = result.components.schemas["ModelAnyOf"]
+    assert isinstance(schema_obj, Schema)
+    props = schema_obj.properties
+    assert props is not None
+    maybe_schema = props["maybe"]
+    assert isinstance(maybe_schema, Schema)
+    assert maybe_schema.anyOf is not None
+    types = {s.type for s in maybe_schema.anyOf if isinstance(s, Schema)}
+    assert types == {"integer", "null"}
+
+
+@pytest.mark.skipif(not PYDANTIC_V2, reason="requires Pydantic V2 for union_format")
+def test_construct_open_api_with_schema_class_union_format_primitive_array() -> None:
+    from typing import Optional
+
+    class ModelPrimitiveArray(BaseModel):
+        maybe: Optional[int] = None
+
+    api_obj = OpenAPI(
+        info=Info(title="Union API", version="v0.0.1"),
+        paths={
+            "/union": PathItem(
+                post=Operation(
+                    requestBody=RequestBody(
+                        content={
+                            "application/json": MediaType(
+                                schema=PydanticSchema(schema_class=ModelPrimitiveArray)
+                            )
+                        }
+                    ),
+                    responses={"200": Response(description="ok")},
+                )
+            )
+        },
+    )
+    result = construct_open_api_with_schema_class(
+        api_obj, union_format="primitive_type_array"
+    )
+    assert result.components is not None
+    assert result.components.schemas is not None
+    schema_obj = result.components.schemas["ModelPrimitiveArray"]
+    assert isinstance(schema_obj, Schema)
+    props = schema_obj.properties
+    assert props is not None
+    maybe_schema = props["maybe"]
+    # primitive_type_array should render type as array of primitive types when possible
+    assert isinstance(maybe_schema, Schema)
+    assert maybe_schema.anyOf is None
+    assert isinstance(maybe_schema.type, list)
+    assert set(maybe_schema.type) == {"integer", "null"}
 
 
 class PingRequest(BaseModel):

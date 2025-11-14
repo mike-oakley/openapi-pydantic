@@ -51,7 +51,10 @@ def get_mode(
     """
     if not hasattr(cls, "model_config"):
         return default
-    mode = cls.model_config.get("json_schema_mode", default)
+    config = cls.model_config
+    mode = config.get(
+        "json_schema_mode_override", config.get("json_schema_mode", default)
+    )
     if mode not in ("validation", "serialization"):
         raise ValueError(f"invalid json_schema_mode: {mode}")
     return cast(JsonSchemaMode, mode)
@@ -121,6 +124,7 @@ def construct_open_api_with_schema_class(
     schema_classes: Optional[List[Type[BaseModel]]] = None,
     scan_for_pydantic_schema_reference: bool = True,
     by_alias: bool = True,
+    **kwargs: Any,
 ) -> OpenAPI:
     """Construct an OpenAPI object, utilising Pydantic classes to produce JSON schemas.
 
@@ -159,10 +163,11 @@ def construct_open_api_with_schema_class(
             by_alias=by_alias,
             ref_template=ref_template,
             schema_generator=GenerateOpenAPI30Schema,
+            **kwargs,
         )
     else:
         schema_definitions = v1_schema(
-            schema_classes, by_alias=by_alias, ref_prefix=ref_prefix
+            schema_classes, by_alias=by_alias, ref_prefix=ref_prefix, **kwargs
         )
 
     if not new_open_api.components:
