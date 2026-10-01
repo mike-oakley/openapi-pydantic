@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import Any, Dict, Generic, List, Optional, Set, Type, TypeVar, cast
+from typing import Any, Dict, Generic, List, Optional, Set, Type, TypeVar
 
 from pydantic import BaseModel
 
@@ -42,7 +42,7 @@ def get_mode(
     mode = cls.model_config.get("json_schema_mode", default)
     if mode not in ("validation", "serialization"):
         raise ValueError(f"invalid json_schema_mode: {mode}")
-    return cast(JsonSchemaMode, mode)
+    return mode
 
 
 def construct_open_api_with_schema_class(

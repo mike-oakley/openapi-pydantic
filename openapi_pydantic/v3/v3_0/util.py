@@ -11,7 +11,6 @@ from typing import (
     Type,
     TypeVar,
     Union,
-    cast,
 )
 
 from pydantic import BaseModel
@@ -54,7 +53,7 @@ def get_mode(
     mode = cls.model_config.get("json_schema_mode", default)
     if mode not in ("validation", "serialization"):
         raise ValueError(f"invalid json_schema_mode: {mode}")
-    return cast(JsonSchemaMode, mode)
+    return mode
 
 
 if TYPE_CHECKING:
