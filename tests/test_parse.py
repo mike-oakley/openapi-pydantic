@@ -25,8 +25,8 @@ def test_parse_obj_3_0(
     )
 
 
-@pytest.mark.parametrize("version", ["3.1.1", "3.1.0"])
-def test_parse_obj_3_1(version: Literal["3.1.1", "3.1.0"]) -> None:
+@pytest.mark.parametrize("version", ["3.1.2", "3.1.1", "3.1.0"])
+def test_parse_obj_3_1(version: Literal["3.1.2", "3.1.1", "3.1.0"]) -> None:
     result = parse_obj(
         {
             "openapi": version,
