@@ -1,6 +1,6 @@
 [project]
 name = "openapi-pydantic"
-version = "0.5.1"
+version = "0.6.0"
 description = "Modern, type-safe OpenAPI schemas in Python using Pydantic 1.8+ and 2.x"
 authors = [
   { name = "Mike Oakley", email = "mike-oakley@users.noreply.github.com" },
