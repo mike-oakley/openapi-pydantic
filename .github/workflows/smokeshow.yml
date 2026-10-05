@@ -23,8 +23,8 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         id: setup-python
         with:
           python-version: '3.12'
@@ -33,7 +33,7 @@ jobs:
         with:
           version: "${{ env.UV_VERSION }}"
           enable-cache: true
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         with:
           name: coverage-html
           path: htmlcov
