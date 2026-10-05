@@ -106,6 +106,13 @@ _examples = [
             },
         ],
     },
+    {
+        "type": "array",
+        "prefixItems": [{"type": "number"}, {"type": "string"}],
+        "items": False,
+        "minItems": 2,
+        "maxItems": 2,
+    },
 ]
 
 
@@ -133,7 +140,7 @@ class Schema(BaseModel):
     and follow the same specifications:
     """
 
-    allOf: Optional[List[Union[Reference, "Schema"]]] = None
+    allOf: Optional[List[Union[Reference, "Schema", bool]]] = None
     """
     This keyword's value MUST be a non-empty array.  Each item of the
     array MUST be a valid JSON Schema.
@@ -143,7 +150,7 @@ class Schema(BaseModel):
     value.
     """
 
-    anyOf: Optional[List[Union[Reference, "Schema"]]] = None
+    anyOf: Optional[List[Union[Reference, "Schema", bool]]] = None
     """
     This keyword's value MUST be a non-empty array.  Each item of the
     array MUST be a valid JSON Schema.
@@ -155,7 +162,7 @@ class Schema(BaseModel):
     each subschema that validates successfully.
     """
 
-    oneOf: Optional[List[Union[Reference, "Schema"]]] = None
+    oneOf: Optional[List[Union[Reference, "Schema", bool]]] = None
     """
     This keyword's value MUST be a non-empty array.  Each item of the
     array MUST be a valid JSON Schema.
@@ -165,7 +172,9 @@ class Schema(BaseModel):
     keyword's value.
     """
 
-    schema_not: Optional[Union[Reference, "Schema"]] = Field(default=None, alias="not")
+    schema_not: Optional[Union[Reference, "Schema", bool]] = Field(
+        default=None, alias="not"
+    )
     """
     This keyword's value MUST be a valid JSON Schema.
 
@@ -173,7 +182,9 @@ class Schema(BaseModel):
     successfully against the schema defined by this keyword.
     """
 
-    schema_if: Optional[Union[Reference, "Schema"]] = Field(default=None, alias="if")
+    schema_if: Optional[Union[Reference, "Schema", bool]] = Field(
+        default=None, alias="if"
+    )
     """
     This keyword's value MUST be a valid JSON Schema.
 
@@ -194,7 +205,7 @@ class Schema(BaseModel):
     keyword is present without either "then" or "else".
     """
 
-    then: Optional[Union[Reference, "Schema"]] = None
+    then: Optional[Union[Reference, "Schema", bool]] = None
     """
     This keyword's value MUST be a valid JSON Schema.
 
@@ -209,7 +220,7 @@ class Schema(BaseModel):
     annotation collection purposes, in such cases.
     """
 
-    schema_else: Optional[Union[Reference, "Schema"]] = Field(
+    schema_else: Optional[Union[Reference, "Schema", bool]] = Field(
         default=None, alias="else"
     )
     """
@@ -225,7 +236,7 @@ class Schema(BaseModel):
     or annotation collection purposes, in such cases.
     """
 
-    dependentSchemas: Optional[Dict[str, Union[Reference, "Schema"]]] = None
+    dependentSchemas: Optional[Dict[str, Union[Reference, "Schema", bool]]] = None
     """
     This keyword specifies subschemas that are evaluated if the instance
     is an object and contains a certain property.
@@ -240,7 +251,7 @@ class Schema(BaseModel):
     Omitting this keyword has the same behavior as an empty object.
     """
 
-    prefixItems: Optional[List[Union[Reference, "Schema"]]] = None
+    prefixItems: Optional[List[Union[Reference, "Schema", bool]]] = None
     """
     The value of "prefixItems" MUST be a non-empty array of valid JSON
     Schemas.
@@ -261,7 +272,7 @@ class Schema(BaseModel):
     array.
     """
 
-    items: Optional[Union[Reference, "Schema"]] = None
+    items: Optional[Union[Reference, "Schema", bool]] = None
     """
     The value of "items" MUST be a valid JSON Schema.
 
@@ -289,7 +300,7 @@ class Schema(BaseModel):
     Implementations that do not support annotation collection MUST do so.
     """
 
-    contains: Optional[Union[Reference, "Schema"]] = None
+    contains: Optional[Union[Reference, "Schema", bool]] = None
     """
     The value of this keyword MUST be a valid JSON Schema.
 
@@ -311,7 +322,7 @@ class Schema(BaseModel):
     array to which this keyword's schema applies is empty.
     """
 
-    properties: Optional[Dict[str, Union[Reference, "Schema"]]] = None
+    properties: Optional[Dict[str, Union[Reference, "Schema", bool]]] = None
     """
     The value of "properties" MUST be an object.  Each value of this
     object MUST be a valid JSON Schema.
@@ -328,7 +339,7 @@ class Schema(BaseModel):
     object.
     """
 
-    patternProperties: Optional[Dict[str, Union[Reference, "Schema"]]] = None
+    patternProperties: Optional[Dict[str, Union[Reference, "Schema", bool]]] = None
     """
     The value of "patternProperties" MUST be an object.  Each property
     name of this object SHOULD be a valid regular expression, according
@@ -374,7 +385,7 @@ class Schema(BaseModel):
     Implementations that do not support annotation collection MUST do so.
     """
 
-    propertyNames: Optional[Union[Reference, "Schema"]] = None
+    propertyNames: Optional[Union[Reference, "Schema", bool]] = None
     """
     The value of "propertyNames" MUST be a valid JSON Schema.
 
@@ -386,7 +397,7 @@ class Schema(BaseModel):
     Omitting this keyword has the same behavior as an empty schema.
     """
 
-    unevaluatedItems: Optional[Union[Reference, "Schema"]] = None
+    unevaluatedItems: Optional[Union[Reference, "Schema", bool]] = None
     """
     The value of "unevaluatedItems" MUST be a valid JSON Schema.
 
@@ -421,7 +432,7 @@ class Schema(BaseModel):
     schema.
     """
 
-    unevaluatedProperties: Optional[Union[Reference, "Schema"]] = None
+    unevaluatedProperties: Optional[Union[Reference, "Schema", bool]] = None
     """
     The value of "unevaluatedProperties" MUST be a valid JSON Schema.
 
@@ -755,7 +766,7 @@ class Schema(BaseModel):
     type, as defined by RFC 2046 [RFC2046].
     """
 
-    contentSchema: Optional[Union[Reference, "Schema"]] = None
+    contentSchema: Optional[Union[Reference, "Schema", bool]] = None
     """
     If the instance is a string, and if "contentMediaType" is present,
     this property contains a schema which describes the structure of the
