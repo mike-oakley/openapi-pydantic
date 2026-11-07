@@ -131,7 +131,8 @@ def test_pydantic_discriminator_openapi_generation() -> None:
     open_api = construct_open_api_with_schema_class(construct_base_open_api())
     assert open_api.components is not None
     assert open_api.components.schemas is not None
-    json_schema = open_api.components.schemas["RequestModel"]
+    json_schema: Union[Schema, bool] = open_api.components.schemas["RequestModel"]
+    assert isinstance(json_schema, Schema)
     assert json_schema.properties == {
         "data": Schema(
             oneOf=[

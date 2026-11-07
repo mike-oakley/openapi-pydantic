@@ -1,10 +1,11 @@
 import logging
-from typing import Callable, Generic, TypeVar
+from typing import Any, Callable, Dict, Generic, TypeVar, Union
 
 import pytest
 from pydantic import BaseModel, Field
 
 from openapi_pydantic import (
+    Components,
     Info,
     MediaType,
     OpenAPI,
@@ -13,9 +14,14 @@ from openapi_pydantic import (
     Reference,
     RequestBody,
     Response,
+    Schema,
 )
-from openapi_pydantic.compat import PYDANTIC_V2
-from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
+from openapi_pydantic.compat import DEFS_KEY, PYDANTIC_V2
+from openapi_pydantic.util import (
+    PydanticSchema,
+    _validate_schemas,
+    construct_open_api_with_schema_class,
+)
 
 
 def test_construct_open_api_with_schema_class_1() -> None:
@@ -48,7 +54,10 @@ def test_construct_open_api_with_schema_class_3() -> None:
     result_with_alias_1 = construct_open_api_with_schema_class(open_api_3)
     assert result_with_alias_1.components is not None
     assert result_with_alias_1.components.schemas is not None
-    schema_with_alias = result_with_alias_1.components.schemas["PongResponse"]
+    schema_with_alias: Union[Schema, bool] = result_with_alias_1.components.schemas[
+        "PongResponse"
+    ]
+    assert isinstance(schema_with_alias, Schema)
     assert schema_with_alias.properties is not None
     assert "pong_foo" in schema_with_alias.properties
     assert "pong_bar" in schema_with_alias.properties
@@ -63,10 +72,33 @@ def test_construct_open_api_with_schema_class_3() -> None:
     )
     assert result_without_alias.components is not None
     assert result_without_alias.components.schemas is not None
-    schema_without_alias = result_without_alias.components.schemas["PongResponse"]
+    schema_without_alias: Union[Schema, bool] = result_without_alias.components.schemas[
+        "PongResponse"
+    ]
+    assert isinstance(schema_without_alias, Schema)
     assert schema_without_alias.properties is not None
     assert "resp_foo" in schema_without_alias.properties
     assert "resp_bar" in schema_without_alias.properties
+
+
+@pytest.mark.parametrize("boolean_schema", (True, False))
+def test_construct_open_api_preserves_boolean_components(boolean_schema: bool) -> None:
+    open_api: OpenAPI = OpenAPI(
+        info={"title": "Boolean schemas", "version": "1"},
+        components=Components(schemas={"Boolean": boolean_schema}),
+    )
+    result: OpenAPI = construct_open_api_with_schema_class(open_api, [PingResponse])
+    assert result.components is not None
+    assert result.components.schemas is not None
+    assert result.components.schemas["Boolean"] is boolean_schema
+    assert isinstance(result.components.schemas["PingResponse"], Schema)
+
+
+@pytest.mark.parametrize("boolean_schema", (True, False))
+def test_validate_generated_boolean_schema_definitions(boolean_schema: bool) -> None:
+    data: Dict[str, Any] = {DEFS_KEY: {"Boolean": boolean_schema}}
+    result: Dict[str, Union[Schema, bool]] = _validate_schemas(data)
+    assert result["Boolean"] is boolean_schema
 
 
 @pytest.mark.skipif(PYDANTIC_V2, reason="generic type for Pydantic V1")
