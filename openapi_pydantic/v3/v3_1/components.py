@@ -1,6 +1,6 @@
 from typing import Dict, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictBool
 
 from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
@@ -99,7 +99,7 @@ class Components(BaseModel):
     unless they are explicitly referenced from properties outside the components object.
     """
 
-    schemas: Optional[Dict[str, Schema]] = None
+    schemas: Optional[Dict[str, Union[Schema, StrictBool]]] = None
     """An object to hold reusable [Schema Objects](#schemaObject)."""
 
     responses: Optional[Dict[str, Union[Response, Reference]]] = None

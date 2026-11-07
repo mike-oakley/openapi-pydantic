@@ -1,7 +1,7 @@
 import enum
 from typing import Any, Dict, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictBool
 
 from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
@@ -123,7 +123,7 @@ class ParameterBase(BaseModel):
     For all other styles, the default value is `false`.
     """
 
-    param_schema: Optional[Union[Schema, Reference]] = Field(
+    param_schema: Optional[Union[Schema, Reference, StrictBool]] = Field(
         default=None, alias="schema"
     )
     """

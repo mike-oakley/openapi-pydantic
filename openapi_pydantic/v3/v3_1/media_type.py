@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictBool
 
 from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra
 
@@ -42,7 +42,7 @@ _examples = [
 class MediaType(BaseModel):
     """Provides schema and examples for the media type identified by its key."""
 
-    media_type_schema: Optional[Union[Reference, Schema]] = Field(
+    media_type_schema: Optional[Union[Reference, Schema, StrictBool]] = Field(
         default=None, alias="schema"
     )
     """
