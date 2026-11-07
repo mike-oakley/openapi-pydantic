@@ -1,7 +1,8 @@
 """Compatibility layer to make this package usable with Pydantic 1 or 2."""
 
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
+from pydantic import confloat, conint
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     "v1_schema",
     "DEFS_KEY",
     "min_length_arg",
+    "PositiveNumber",
 ]
 
 PYDANTIC_MAJOR_VERSION = int(PYDANTIC_VERSION.split(".", 1)[0])
@@ -28,6 +30,9 @@ if TYPE_CHECKING:
 
     from pydantic import BaseModel
     from pydantic import ConfigDict as PydanticConfigDict
+    from typing_extensions import TypeAlias
+
+    PositiveNumber: TypeAlias = Union[int, float]
 
     def ConfigDict(
         extra: Literal["allow", "ignore", "forbid"] = "allow",
@@ -119,3 +124,8 @@ else:
     models_json_schema = None
     JsonSchemaMode = None
     RootModel = None
+
+
+if not TYPE_CHECKING:
+    # Strict union members preserve floats on Pydantic 1 as well as large ints.
+    PositiveNumber = Union[conint(strict=True, gt=0), confloat(strict=True, gt=0)]

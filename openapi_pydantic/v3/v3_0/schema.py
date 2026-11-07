@@ -1,8 +1,14 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictFloat, StrictInt
 
-from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra, min_length_arg
+from openapi_pydantic.compat import (
+    PYDANTIC_V2,
+    ConfigDict,
+    Extra,
+    PositiveNumber,
+    min_length_arg,
+)
 
 from .datatype import DataType
 from .discriminator import Discriminator
@@ -135,7 +141,7 @@ class Schema(BaseModel):
     The title will preferably be short.
     """
 
-    multipleOf: Optional[float] = Field(default=None, gt=0.0)
+    multipleOf: Optional[PositiveNumber] = None
     """
     The value of "multipleOf" MUST be a number, strictly greater than 0.
 
@@ -143,7 +149,7 @@ class Schema(BaseModel):
     results in an integer.
     """
 
-    maximum: Optional[float] = None
+    maximum: Optional[Union[StrictInt, StrictFloat]] = None
     """
     The value of "maximum" MUST be a number, representing an upper limit
     for a numeric instance.
@@ -166,7 +172,7 @@ class Schema(BaseModel):
     value of "maximum".
     """
 
-    minimum: Optional[float] = None
+    minimum: Optional[Union[StrictInt, StrictFloat]] = None
     """
     The value of "minimum" MUST be a number, representing a lower limit
     for a numeric instance.
