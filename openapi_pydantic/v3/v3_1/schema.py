@@ -1,8 +1,15 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictFloat, StrictInt, validator
 
-from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra, min_length_arg
+from openapi_pydantic.compat import (
+    PYDANTIC_V2,
+    ConfigDict,
+    Extra,
+    PositiveNumber,
+    decimal_to_float,
+    min_length_arg,
+)
 
 from .datatype import DataType
 from .discriminator import Discriminator
@@ -499,7 +506,7 @@ class Schema(BaseModel):
     is equal to the value of the keyword.
     """
 
-    multipleOf: Optional[float] = Field(default=None, gt=0.0)
+    multipleOf: Optional[PositiveNumber] = None
     """
     The value of "multipleOf" MUST be a number, strictly greater than 0.
 
@@ -507,7 +514,7 @@ class Schema(BaseModel):
     results in an integer.
     """
 
-    maximum: Optional[float] = None
+    maximum: Optional[Union[StrictInt, StrictFloat]] = None
     """
     The value of "maximum" MUST be a number, representing an inclusive
     upper limit for a numeric instance.
@@ -516,7 +523,7 @@ class Schema(BaseModel):
     instance is less than or exactly equal to "maximum".
     """
 
-    exclusiveMaximum: Optional[float] = None
+    exclusiveMaximum: Optional[Union[StrictInt, StrictFloat]] = None
     """
     The value of "exclusiveMaximum" MUST be a number, representing an
     exclusive upper limit for a numeric instance.
@@ -525,7 +532,7 @@ class Schema(BaseModel):
     has a value strictly less than (not equal to) "exclusiveMaximum".
     """
 
-    minimum: Optional[float] = None
+    minimum: Optional[Union[StrictInt, StrictFloat]] = None
     """
     The value of "minimum" MUST be a number, representing an inclusive
     lower limit for a numeric instance.
@@ -534,7 +541,7 @@ class Schema(BaseModel):
     instance is greater than or exactly equal to "minimum".
     """
 
-    exclusiveMinimum: Optional[float] = None
+    exclusiveMinimum: Optional[Union[StrictInt, StrictFloat]] = None
     """
     The value of "exclusiveMinimum" MUST be a number, representing an
     exclusive lower limit for a numeric instance.
@@ -947,6 +954,15 @@ class Schema(BaseModel):
         )
 
     else:
+        _normalize_decimal_constraints = validator(
+            "multipleOf",
+            "maximum",
+            "exclusiveMaximum",
+            "minimum",
+            "exclusiveMinimum",
+            pre=True,
+            allow_reuse=True,
+        )(decimal_to_float)
 
         class Config:
             extra = Extra.allow
