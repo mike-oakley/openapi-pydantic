@@ -1,5 +1,6 @@
 import logging
-from typing import Callable, Generic, Literal, TypeVar
+from decimal import Decimal
+from typing import Any, Callable, Dict, Generic, Literal, TypeVar
 
 import pytest
 from pydantic import BaseModel, Field
@@ -20,6 +21,35 @@ from openapi_pydantic.v3.v3_0.util import (
     PydanticSchema,
     construct_open_api_with_schema_class,
 )
+
+
+def test_construct_open_api_with_decimal_constraints() -> None:
+    constraints: Dict[str, Any] = {
+        "ge": Decimal("0.01"),
+        "le": Decimal("100.00"),
+        "multiple_of": Decimal("0.01"),
+    }
+
+    class Money(BaseModel):
+        amount: Decimal = Field(**constraints)
+
+    result = construct_open_api_with_schema_class(
+        OpenAPI(info=Info(title="Money API", version="1"), paths={}), [Money]
+    )
+    assert result.components is not None
+    assert result.components.schemas is not None
+    money_schema = result.components.schemas["Money"]
+    assert isinstance(money_schema, Schema)
+    assert money_schema.properties is not None
+    schema = money_schema.properties["amount"]
+    assert isinstance(schema, Schema)
+    if PYDANTIC_V2:
+        assert schema.anyOf is not None
+        schema = schema.anyOf[0]
+        assert isinstance(schema, Schema)
+    assert schema.minimum == 0.01
+    assert schema.maximum == 100.0
+    assert schema.multipleOf == 0.01
 
 
 def test_construct_open_api_with_schema_class_1() -> None:

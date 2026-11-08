@@ -1,5 +1,6 @@
 import json
 import logging
+from decimal import Decimal
 from typing import Any, Callable, Dict, Type, Union
 
 import pytest
@@ -91,9 +92,10 @@ def test_numeric_constraints_preserve_type_and_precision(
 
 
 @pytest.mark.parametrize("schema_type", (v3_0.Schema, v3_1.Schema))
-@pytest.mark.parametrize("value", (0, -1, 0.0, -1.5))
+@pytest.mark.parametrize("value", (0, -1, 0.0, -1.5, Decimal("0"), Decimal("-0.01")))
 def test_multiple_of_rejects_nonpositive_values(
-    schema_type: Type[Union[v3_0.Schema, v3_1.Schema]], value: Union[int, float]
+    schema_type: Type[Union[v3_0.Schema, v3_1.Schema]],
+    value: Union[int, float, Decimal],
 ) -> None:
     with pytest.raises(ValidationError):
         schema_type(multipleOf=value)

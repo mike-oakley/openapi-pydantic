@@ -1,12 +1,13 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field, StrictFloat, StrictInt
+from pydantic import BaseModel, Field, StrictFloat, StrictInt, validator
 
 from openapi_pydantic.compat import (
     PYDANTIC_V2,
     ConfigDict,
     Extra,
     PositiveNumber,
+    decimal_to_float,
     min_length_arg,
 )
 
@@ -596,6 +597,9 @@ class Schema(BaseModel):
         )
 
     else:
+        _normalize_decimal_constraints = validator(
+            "multipleOf", "maximum", "minimum", pre=True, allow_reuse=True
+        )(decimal_to_float)
 
         class Config:
             extra = Extra.allow

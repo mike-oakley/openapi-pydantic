@@ -1,5 +1,6 @@
 import logging
-from typing import Callable, Generic, TypeVar
+from decimal import Decimal
+from typing import Any, Callable, Dict, Generic, TypeVar
 
 import pytest
 from pydantic import BaseModel, Field
@@ -13,9 +14,42 @@ from openapi_pydantic import (
     Reference,
     RequestBody,
     Response,
+    Schema,
 )
 from openapi_pydantic.compat import PYDANTIC_V2
 from openapi_pydantic.util import PydanticSchema, construct_open_api_with_schema_class
+
+
+def test_construct_open_api_with_decimal_constraints() -> None:
+    constraints: Dict[str, Any] = {
+        "ge": Decimal("0.01"),
+        "le": Decimal("100.00"),
+        "multiple_of": Decimal("0.01"),
+    }
+
+    class Money(BaseModel):
+        amount: Decimal = Field(**constraints)
+        exclusive_amount: Decimal = Field(gt=Decimal("0.01"), lt=Decimal("100.00"))
+
+    result = construct_open_api_with_schema_class(
+        OpenAPI(info=Info(title="Money API", version="1")), [Money]
+    )
+    assert result.components is not None
+    assert result.components.schemas is not None
+    properties = result.components.schemas["Money"].properties
+    assert properties is not None
+    for name, expected in (
+        ("amount", {"minimum": 0.01, "maximum": 100.0, "multipleOf": 0.01}),
+        ("exclusive_amount", {"exclusiveMinimum": 0.01, "exclusiveMaximum": 100.0}),
+    ):
+        schema = properties[name]
+        assert isinstance(schema, Schema)
+        if PYDANTIC_V2:
+            assert schema.anyOf is not None
+            schema = schema.anyOf[0]
+            assert isinstance(schema, Schema)
+        for field, value in expected.items():
+            assert getattr(schema, field) == value
 
 
 def test_construct_open_api_with_schema_class_1() -> None:
